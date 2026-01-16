@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -8,13 +8,18 @@ import {
   TextInput
 } from 'react-native';
 import { Link, useRouter } from 'expo-router'; // ✅ Added useRouter
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import sampleBusData from '../src/data/busData';
+
+const [savedRoutes, setSavedRoutes] = useState([]);
+
 
 export default function BusListScreen() {
   const [searchText, setSearchText] = useState('');
   const [buses] = useState(sampleBusData);
   const router = useRouter(); // ✅ This creates the router object
+  const [savedRoutes, setSavedRoutes] = useState([]);
 
   // Filter buses based on search
   const filteredBuses = buses.filter(bus => 
@@ -24,6 +29,41 @@ export default function BusListScreen() {
     bus.end.toLowerCase().includes(searchText.toLowerCase()) ||
     bus.through.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  useEffect(() => {
+  const loadSavedRoutes = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('savedRoutes');
+      if (saved) {
+        setSavedRoutes(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.log('Failed to load saved routes', e);
+    }
+  };
+  loadSavedRoutes();
+}, []);
+
+const toggleSavedRoute = async (busId) => {
+  let updatedSaved;
+  if (savedRoutes.includes(busId)) {
+    // Remove from saved
+    updatedSaved = savedRoutes.filter(id => id !== busId);
+  } else {
+    // Add to saved
+    updatedSaved = [...savedRoutes, busId];
+  }
+
+  setSavedRoutes(updatedSaved);
+
+  try {
+    await AsyncStorage.setItem('savedRoutes', JSON.stringify(updatedSaved));
+  } catch (e) {
+    console.log('Failed to save routes', e);
+  }
+};
+
+
 
   const renderBusItem = ({ item }) => (
     <Link href={`/bus-detail/${item.id}`} asChild>
@@ -38,6 +78,12 @@ export default function BusListScreen() {
             <Text style={styles.busRoute}>
               {item.start} → {item.end}
             </Text>
+      
+            <TouchableOpacity onPress={() => toggleSavedRoute(item.id)} style={styles.starButton}>
+    <Text style={{ fontSize: 24 }}>
+      {savedRoutes.includes(item.id) ? '⭐' : '☆'}
+    </Text>
+  </TouchableOpacity>
           </View>
         </View>
         
@@ -302,4 +348,10 @@ const styles = StyleSheet.create({
     color: '#BDC3C7',
     textAlign: 'center',
   },
+  starButton: {
+  position: 'absolute',
+  top: 10,
+  right: 10,
+},
+
 });
