@@ -640,13 +640,13 @@ const busData = [
   {
     id: '59',
     number: '59',
-    name: 'Kotebe - Mexico',
-    start: 'Kotebe',
-    through: 'Sidist Kilo',
-    end: 'Mexico',
+    name: 'Betel Hospital - Mililik Sqare',
+    start: 'Betel Hospital',
+    through: 'Coca Cola',
+    end: 'Mililik Sqare',
     distance: '11.9 Km',
     fare: '2.4 Birr',
-    route: ['Kotebe', 'Sidist Kilo', 'Mexico'],
+    route: ['Betel Hospital', 'Coca Cola', 'Mililik Sqare'],
   },
   {
     id: '60',
