@@ -1,50 +1,90 @@
-# Welcome to your Expo app 👋
+# Addis City Bus Guide 
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple, offline-first mobile application built with **React Native** and **Expo** that helps users find Addis Ababa city bus routes, fares, and destinations easily.
 
-## Get started
+---
 
-1. Install dependencies
+## ✨ Features
 
-   ```bash
-   npm install
-   ```
+- 🔍 Browse all city bus routes
+- 🔎 Search by bus number, origin, destination, or via
+- 🧭 View detailed route information
+- 💰 See fare and distance clearly
+- 📱 Works fully offline
+- 🌙 Clean UI with consistent theme
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 📱 Screens
 
-In the output, you'll find options to open the app in a
+- **Home**
+- **Bus List (Browse All Buses)**
+- **Bus Detail Screen**
+  - Start
+  - Via
+  - Destination
+  - Fare & distance
+  - Full route stops
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠️ Tech Stack
 
-## Get a fresh project
+- **React Native**
+- **Expo**
+- **Expo Router**
+- **JavaScript**
+- **Git & GitHub**
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+## 📂 Project Structure
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```text
+addis_city_bus_info/
+├── app/
+│   ├── index.jsx          # Home screen
+│   ├── bus-list.jsx       # List of all buses
+│   ├── bus-detail/
+│   │   └── [id].jsx       # Bus detail screen
+│   └── _layout.jsx        # App layout
+├── src/                   # Shared components & utilities
+├── package.json
+└── README.md
 
-## Learn more
+ Getting Started
 
-To learn more about developing your project with Expo, look at the following resources:
+1️⃣ Clone the repository
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+git clone https://github.com/YOUR_USERNAME/addis_city_bus_info.git
+cd addis_city_bus_info
 
-## Join the community
+2️⃣ Install dependencies
 
-Join our community of developers creating universal apps.
+npm install
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+3️⃣ Run the app
+
+npx expo start 
+
+Then scan the QR code with Expo Go or run on an emulator.
+
+📦 Data Source
+
+.  Bus route data is currently stored locally in the app.
+
+.  Designed to work offline.
+
+.  Future versions may support dynamic updates.
+
+🧩 Future Improvements
+
+.  🗺️ Map integration
+
+.  ⭐ Favorite routes
+
+.  🚌 Route directions (two-way)
+
+.  🌐 Multi-language support (Amharic / English)
+
+.  ☁️ Remote data sync
