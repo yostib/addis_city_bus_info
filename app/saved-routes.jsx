@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
 
   customHeader: {
-    backgroundColor: '#1E8449',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    paddingTop: 50,
-    paddingBottom: 15,
-  },
+  backgroundColor: '#1E8449',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: 15,
+  paddingTop: Platform.OS === 'ios' ? 50 : 20, // adjusts for status bar
+  paddingBottom: 15,
+},
   backButton: { padding: 8 },
   backButtonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
   customHeaderTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFF' },
