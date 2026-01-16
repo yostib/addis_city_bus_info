@@ -8,53 +8,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-// Same sample data as in bus-list.jsx
-const busData = [
-  {
-    id: '1',
-    number: '1',
-    name: 'Megenagna - Kara',
-    start: 'Megenagna',
-    through: 'Gurd Shola',
-    end: 'Kara',
-    distance: '7.7 Km',
-    fare: '1.4 Birr',
-    route: ['Megenagna', 'Gurd Shola', 'Kara']
-  },
-  {
-    id: '2',
-    number: '2',
-    name: 'Autobus Tera - Kality',
-    start: 'Autobus Tera',
-    through: 'Mekanisa',
-    end: 'Kality',
-    distance: '9.2 Km',
-    fare: '1.6 Birr',
-    route: ['Autobus Tera', 'Mekanisa', 'Kality']
-  },
-  {
-    id: '3',
-    number: '3',
-    name: 'Megenagna - Kara',
-    start: 'Megenagna',
-    through: 'Jemo',
-    end: 'Kara',
-    distance: '8.1 Km',
-    fare: '1.5 Birr',
-    route: ['Megenagna', 'Jemo', 'Kara']
-  },
-  {
-    id: '4',
-    number: '4',
-    name: 'Merkato - Bole',
-    start: 'Merkato',
-    through: 'Piazza',
-    end: 'Bole',
-    distance: '8.5 Km',
-    fare: '1.7 Birr',
-    route: ['Merkato', 'Piazza', 'Mexico', 'Bole']
-  }
-];
+
+import busData from '../../src/data/busData';
 
 export default function BusDetailScreen() {
   const { id } = useLocalSearchParams();
