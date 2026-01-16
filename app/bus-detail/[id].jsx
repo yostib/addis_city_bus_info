@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -7,7 +7,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import busData from '../../src/data/busData';
 
@@ -17,6 +17,31 @@ export default function BusDetailScreen() {
 
   const bus = busData.find(b => b.id === id);
 
+  // ✅ Saved routes state
+  const [savedRoutes, setSavedRoutes] = useState([]);
+
+  // ✅ Load saved routes from AsyncStorage
+  useEffect(() => {
+    const loadSavedRoutes = async () => {
+      const saved = await AsyncStorage.getItem('savedRoutes');
+      if (saved) setSavedRoutes(JSON.parse(saved));
+    };
+    loadSavedRoutes();
+  }, []);
+
+  // ✅ Toggle save / remove route
+  const toggleSaveRoute = async () => {
+    let updatedRoutes = [];
+    if (savedRoutes.includes(bus.id)) {
+      updatedRoutes = savedRoutes.filter(rid => rid !== bus.id);
+    } else {
+      updatedRoutes = [...savedRoutes, bus.id];
+    }
+    setSavedRoutes(updatedRoutes);
+    await AsyncStorage.setItem('savedRoutes', JSON.stringify(updatedRoutes));
+  };
+
+  // ✅ Handle bus not found
   if (!bus) {
     return (
       <View style={styles.container}>
@@ -31,35 +56,49 @@ export default function BusDetailScreen() {
 
       {/* Custom Header */}
       <View style={styles.customHeader}>
-  <TouchableOpacity
-    style={[styles.navButton, styles.backBtn]}
-    onPress={() => router.back()}
-  >
-    <Text style={styles.navButtonText}>← Back</Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.navButton, styles.backBtn]}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.navButtonText}>← Back</Text>
+        </TouchableOpacity>
 
-  <TouchableOpacity
-    style={[styles.navButton, styles.centerBtn]}
-    onPress={() => router.push('/bus-list')}
-  >
-    <Text style={styles.navButtonText}>City Buses</Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.navButton, styles.centerBtn]}
+          onPress={() => router.push('/bus-list')}
+        >
+          <Text style={styles.navButtonText}>City Buses</Text>
+        </TouchableOpacity>
 
-  <TouchableOpacity
-    style={[styles.navButton, styles.homeBtn]}
-    onPress={() => router.push('/')}
-  >
-    <Text style={styles.navButtonText}>Home</Text>
-  </TouchableOpacity>
-</View>
+        <TouchableOpacity
+          style={[styles.navButton, styles.homeBtn]}
+          onPress={() => router.push('/')}
+        >
+          <Text style={styles.navButtonText}>Home</Text>
+        </TouchableOpacity>
+      </View>
 
+      {/* Save / Remove Button */}
+      <TouchableOpacity
+        onPress={toggleSaveRoute}
+        style={{
+          backgroundColor: savedRoutes.includes(bus.id) ? '#E74C3C' : '#27AE60',
+          padding: 10,
+          borderRadius: 8,
+          margin: 15,
+          alignItems: 'center'
+        }}
+      >
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>
+          {savedRoutes.includes(bus.id) ? 'Remove from Saved' : 'Save Route'}
+        </Text>
+      </TouchableOpacity>
 
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.busNumberLarge}>
           <Text style={styles.busNumberText}>{bus.number}</Text>
         </View>
-
         <View style={styles.routeInfo}>
           <Text style={styles.routeName}>{bus.name}</Text>
           <Text style={styles.routeSubtitle}>
@@ -71,7 +110,6 @@ export default function BusDetailScreen() {
       {/* Route Details */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Route Details</Text>
-
         <View style={styles.routeStep}>
           <View style={[styles.stepIcon, styles.startIcon]}>
             <Text style={styles.stepText}>S</Text>
@@ -81,7 +119,6 @@ export default function BusDetailScreen() {
             <Text style={styles.stepLocation}>{bus.start}</Text>
           </View>
         </View>
-
         <View style={styles.routeStep}>
           <View style={[styles.stepIcon, styles.viaIcon]}>
             <Text style={styles.stepText}>V</Text>
@@ -91,7 +128,6 @@ export default function BusDetailScreen() {
             <Text style={styles.stepLocation}>{bus.through}</Text>
           </View>
         </View>
-
         <View style={styles.routeStep}>
           <View style={[styles.stepIcon, styles.endIcon]}>
             <Text style={styles.stepText}>E</Text>
@@ -106,13 +142,11 @@ export default function BusDetailScreen() {
       {/* Trip Info */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Trip Information</Text>
-
         <View style={styles.infoRow}>
           <View style={styles.infoBox}>
             <Text style={styles.infoLabel}>Fare</Text>
             <Text style={styles.infoValue}>{bus.fare}</Text>
           </View>
-
           <View style={styles.infoBox}>
             <Text style={styles.infoLabel}>Distance</Text>
             <Text style={styles.infoValue}>{bus.distance}</Text>
@@ -136,10 +170,12 @@ export default function BusDetailScreen() {
           ℹ️ This app works offline. All data is stored on your device.
         </Text>
       </View>
-
     </ScrollView>
   );
 }
+
+// ✅ Keep your styles the same
+
 
 
 const styles = StyleSheet.create({
