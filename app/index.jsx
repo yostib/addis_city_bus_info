@@ -36,6 +36,17 @@ export default function HomeScreen() {
             </View>
           </TouchableOpacity>
         </Link>
+
+        <Link href="/route-search" asChild>
+          <TouchableOpacity style={styles.cardButton}>
+            <View style={[styles.accent, { backgroundColor: '#C0392B' }]} />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>🔍 Search by Route</Text>
+              <Text style={styles.cardSubtext}>Your frequent buses</Text>
+            </View>
+          </TouchableOpacity>
+        </Link>
+
           
         <Link href="/saved-routes" asChild>
           <TouchableOpacity style={styles.cardButton}>
