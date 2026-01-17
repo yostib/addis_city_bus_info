@@ -4,7 +4,7 @@ import {
   Text, 
   StyleSheet, 
   FlatList, 
-  TouchableOpacity 
+  TouchableOpacity,Platform 
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
