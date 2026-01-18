@@ -13,12 +13,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import busData from '../src/data/busData';
 
+
+const allStops = Array.from(
+  new Set(
+    busData.flatMap(bus => bus.route)
+  )
+);
+
+
 export default function RouteSearchScreen() {
   const router = useRouter();
 
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [results, setResults] = useState([]);
+  const [fromSuggestions, setFromSuggestions] = useState([]);
+  const [toSuggestions, setToSuggestions] = useState([]);
+
 
   const searchRoutes = () => {
     if (!from || !to) {
@@ -61,21 +72,85 @@ export default function RouteSearchScreen() {
           <View style={styles.form}>
             <Text style={styles.label}>From</Text>
             <TextInput
-              style={styles.input}
-              placeholder="Starting location"
-              placeholderTextColor="#888"
-              value={from}
-              onChangeText={setFrom}
-            />
+  style={styles.input}
+  placeholder="Starting location"
+  value={from}
+  onChangeText={(text) => {
+    setFrom(text);
 
-            <Text style={styles.label}>To</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Destination"
-              placeholderTextColor="#888"
-              value={to}
-              onChangeText={setTo}
-            />
+    if (text.length === 0) {
+      setFromSuggestions([]);
+      return;
+    }
+
+    const matches = allStops.filter(stop =>
+      stop.toLowerCase().includes(text.toLowerCase())
+    );
+
+    setFromSuggestions(matches.slice(0, 6));
+  }}
+/>
+
+<Text style={styles.label}>To</Text>
+<TextInput
+  style={styles.input}
+  placeholder="Destination"
+  placeholderTextColor="#888"
+  value={to}
+  onChangeText={(text) => {
+    setTo(text);
+
+    if (text.length === 0) {
+      setToSuggestions([]);
+      return;
+    }
+
+    const matches = allStops.filter(stop =>
+      stop.toLowerCase().includes(text.toLowerCase())
+    );
+
+    setToSuggestions(matches.slice(0, 6));
+  }}
+/>
+
+{toSuggestions.length > 0 && (
+  <View style={styles.suggestionBox}>
+    {toSuggestions.map((stop, index) => (
+      <TouchableOpacity
+        key={index}
+        style={styles.suggestionItem}
+        onPress={() => {
+          setTo(stop);
+          setToSuggestions([]);
+        }}
+      >
+        <Text style={styles.suggestionText}>{stop}</Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+)}
+
+
+
+
+{fromSuggestions.length > 0 && (
+  <View style={styles.suggestionBox}>
+    {fromSuggestions.map((stop, index) => (
+      <TouchableOpacity
+        key={index}
+        style={styles.suggestionItem}
+        onPress={() => {
+          setFrom(stop);
+          setFromSuggestions([]);
+        }}
+      >
+        <Text style={styles.suggestionText}>{stop}</Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+)}
+
+
 
             <TouchableOpacity
               style={styles.searchButton}
@@ -203,4 +278,24 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#64748B',
   },
+  suggestionBox: {
+  backgroundColor: '#fff',
+  borderRadius: 8,
+  marginTop: 4,
+  marginBottom: 12, // 👈 THIS FIXES OVERLAP
+  elevation: 3,
+},
+
+
+suggestionItem: {
+  padding: 12,
+  borderBottomWidth: 1,
+  borderBottomColor: '#eee',
+},
+
+suggestionText: {
+  fontSize: 16,
+  color: '#2C3E50',
+},
+
 });
