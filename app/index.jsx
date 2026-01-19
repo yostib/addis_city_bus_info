@@ -58,6 +58,16 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </Link>
 
+        <Link href="/where-to-go" asChild>
+          <TouchableOpacity style={styles.cardButton}>
+            <View style={[styles.accent, { backgroundColor: '#C0392B' }]} />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Where to</Text>
+              <Text style={styles.cardSubtext}>where do you want to go?</Text>
+            </View>
+          </TouchableOpacity>
+        </Link>
+
       </View>
 
       {/* App Features */}
