@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import busData from '../src/data/busData';
+import { Keyboard } from 'react-native';
 
 const allStops = Array.from(
   new Set(busData.flatMap(bus => bus.route))
@@ -160,9 +161,13 @@ export default function RouteSearchScreen() {
               </TouchableOpacity>
             ))}
 
-            <TouchableOpacity style={styles.searchButton} onPress={searchRoutes}>
+
+
+            <TouchableOpacity style={styles.searchButton} onPress={() => {Keyboard.dismiss(); searchRoutes();}}>
               <Text style={styles.searchText}>Search Routes</Text>
             </TouchableOpacity>
+
+
 
             {results.map(bus => (
               <TouchableOpacity
