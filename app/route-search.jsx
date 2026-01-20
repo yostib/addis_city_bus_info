@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import busData from '../src/data/busData';
 import { Keyboard } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const allStops = Array.from(
   new Set(busData.flatMap(bus => bus.route))
@@ -57,6 +59,32 @@ export default function RouteSearchScreen() {
 
     setResults(matches);
   };
+
+  const [savedRoutes, setSavedRoutes] = useState([]);
+
+useEffect(() => {
+  const loadSaved = async () => {
+    const saved = await AsyncStorage.getItem('savedRoutes');
+    if (saved) setSavedRoutes(JSON.parse(saved));
+  };
+  loadSaved();
+}, []);
+
+const isSaved = (id) => savedRoutes.includes(id);
+
+const toggleSave = async (id) => {
+  let updated;
+
+  if (savedRoutes.includes(id)) {
+    updated = savedRoutes.filter(item => item !== id);
+  } else {
+    updated = [...savedRoutes, id];
+  }
+
+  setSavedRoutes(updated);
+  await AsyncStorage.setItem('savedRoutes', JSON.stringify(updated));
+};
+
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -170,19 +198,36 @@ export default function RouteSearchScreen() {
 
 
             {results.map(bus => (
-              <TouchableOpacity
-                key={bus.id}
-                style={styles.resultItem}
-                onPress={() => router.push(`/bus-detail/${bus.id}`)}
-              >
-                <Text style={styles.resultTitle}>
-                  {bus.number} — {bus.name}
-                </Text>
-                <Text style={styles.resultSubtitle}>
-                  {bus.start} → {bus.end}
-                </Text>
-              </TouchableOpacity>
-            ))}
+  <TouchableOpacity
+    key={bus.id}
+    style={styles.busCard}
+    onPress={() => router.push(`/bus-detail/${bus.id}`)}
+  >
+    <View style={styles.busHeader}>
+      <View style={styles.busNumber}>
+        <Text style={styles.busNumberText}>{bus.number}</Text>
+      </View>
+
+      <View style={styles.busInfo}>
+        <Text style={styles.busName}>{bus.name}</Text>
+        <Text style={styles.busRoute}>
+          {bus.start} → {bus.end}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        onPress={() => toggleSave(bus.id)}
+        hitSlop={10}
+      >
+        <Text style={{ fontSize: 22 }}>
+          {isSaved(bus.id) ? '⭐' : '☆'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </TouchableOpacity>
+))}
+
+
 
             {results.length === 0 && from && to && (
               <Text style={styles.noResult}>No matching routes found</Text>
@@ -269,4 +314,56 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#64748B',
   },
+  busCard: {
+  backgroundColor: 'white',
+  borderRadius: 12,
+  padding: 14,
+  marginBottom: 12,
+  elevation: 3,
+},
+
+busHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
+
+busNumber: {
+  backgroundColor: '#E74C3C',
+  width: 48,
+  height: 48,
+  borderRadius: 12,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: 14,
+},
+
+busNumberText: {
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 18,
+},
+
+busInfo: {
+  flex: 1,
+},
+
+busName: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#1F2937',
+},
+
+busRoute: {
+  color: '#64748B',
+  marginTop: 4,
+},
+starButton: {
+  marginLeft: 10,
+  padding: 6,
+},
+
+starText: {
+  fontSize: 20,
+},
 });

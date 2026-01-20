@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import busData from '../src/data/busData';
 import { Keyboard } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const allStops = Array.from(
@@ -21,12 +22,38 @@ export default function WhereToGoScreen() {
   const router = useRouter();
   const [destination, setDestination] = useState('');
 
+  const [savedRoutes, setSavedRoutes] = useState([]);
+
+
 
   //Auto suggestions state for destination input
   const [suggestions, setSuggestions] = useState([]);
 
   //Find routes going to the destination
   const [results, setResults] = useState([]);
+// Load saved routes from AsyncStorage on component mount
+  useEffect(() => {
+  const loadSaved = async () => {
+    const saved = await AsyncStorage.getItem('savedRoutes');
+    if (saved) setSavedRoutes(JSON.parse(saved));
+  };
+  loadSaved();
+}, []);
+// Toggle save/remove route
+const toggleSaveRoute = async (busId) => {
+  let updated;
+
+  if (savedRoutes.includes(busId)) {
+    updated = savedRoutes.filter(id => id !== busId);
+  } else {
+    updated = [...savedRoutes, busId];
+  }
+
+  setSavedRoutes(updated);
+  await AsyncStorage.setItem('savedRoutes', JSON.stringify(updated));
+};
+
+
 
   // Search buses that go to the specified destination
   const searchBuses = () => {
@@ -104,28 +131,45 @@ export default function WhereToGoScreen() {
 
 
 
-<View style={styles.resultsContainer}>
+<ScrollView style={styles.resultsContainer}>
   {results.map(bus => (
     <TouchableOpacity
       key={bus.id}
       style={styles.busCard}
       onPress={() => router.push(`/bus-detail/${bus.id}`)}
+      activeOpacity={0.85}
     >
       <View style={styles.busHeader}>
+
+        {/* Bus number bubble */}
         <View style={styles.busNumber}>
           <Text style={styles.busNumberText}>{bus.number}</Text>
         </View>
 
+        {/* Bus info */}
         <View style={styles.busInfo}>
           <Text style={styles.busName}>{bus.name}</Text>
           <Text style={styles.busRoute}>
             {bus.start} → {bus.end}
           </Text>
         </View>
+
+        {/* ⭐ SAVE BUTTON */}
+        <TouchableOpacity
+          onPress={() => toggleSaveRoute(bus.id)}
+          style={styles.starButton}
+          hitSlop={10}
+        >
+          <Text style={styles.starText}>
+            {savedRoutes.includes(bus.id) ? '⭐' : '☆'}
+          </Text>
+        </TouchableOpacity>
+
       </View>
     </TouchableOpacity>
   ))}
-</View>
+</ScrollView>
+
 
 
 
@@ -220,6 +264,7 @@ busHeader: {
   alignItems: 'center',
 },
 
+
 busNumber: {
   backgroundColor: '#E74C3C',
   width: 48,
@@ -249,6 +294,14 @@ busName: {
 busRoute: {
   color: '#64748B',
   marginTop: 4,
+},
+starButton: {
+  marginLeft: 10,
+  padding: 6,
+},
+
+starText: {
+  fontSize: 20,
 },
 
 
