@@ -21,15 +21,26 @@ export default function SavedRoutesScreen() {
     };
     loadSavedRoutes();
   }, []);
-  
+
+  // Remove a route from saved routes
+
+  const removeSavedRoute = async (id) => {
+  const updated = savedRoutes.filter(rid => rid !== id);
+  setSavedRoutes(updated);
+  await AsyncStorage.setItem('savedRoutes', JSON.stringify(updated));
+};
+
+  // Render each saved bus item
 
   const renderBusItem = ({ item }) => {
-    const bus = busData.find(b => b.id === item);
-    if (!bus) return null;
+  const bus = busData.find(b => b.id === item);
+  if (!bus) return null;
 
-    return (
-      <TouchableOpacity 
-        style={styles.busCard}
+  return (
+    <View style={styles.busCard}>
+      {/* Tap area → go to details */}
+      <TouchableOpacity
+        style={styles.busMain}
         onPress={() => router.push(`/bus-detail/${bus.id}`)}
       >
         <View style={styles.busHeader}>
@@ -38,12 +49,24 @@ export default function SavedRoutesScreen() {
           </View>
           <View style={styles.busInfo}>
             <Text style={styles.busName}>{bus.name}</Text>
-            <Text style={styles.busRoute}>{bus.start} → {bus.end}</Text>
+            <Text style={styles.busRoute}>
+              {bus.start} → {bus.end}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
-    );
-  };
+
+      {/* Remove button */}
+      <TouchableOpacity
+        style={styles.removeButton}
+        onPress={() => removeSavedRoute(bus.id)}
+      >
+        <Text style={styles.removeText}>Remove</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 
   return (
     <View style={styles.container}>
@@ -133,4 +156,23 @@ const styles = StyleSheet.create({
   emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
   emptyText: { fontSize: 18, fontWeight: '600', color: '#95A5A6', marginBottom: 10 },
   emptySubtext: { fontSize: 14, color: '#BDC3C7', textAlign: 'center' },
+  busMain: {
+  flex: 1,
+},
+
+removeButton: {
+  marginTop: 10,
+  alignSelf: 'flex-end',
+  backgroundColor: '#FEE2E2',
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 8,
+},
+
+removeText: {
+  color: '#B91C1C',
+  fontWeight: '600',
+  fontSize: 14,
+},
+
 });

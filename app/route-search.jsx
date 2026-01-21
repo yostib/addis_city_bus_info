@@ -105,6 +105,8 @@ const toggleSave = async (id) => {
             <View style={{ width: 60 }} />
           </View>
 
+          
+
           <View style={styles.form}>
             {/* FROM */}
             <Text style={styles.label}>From</Text>
@@ -253,6 +255,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 15,
   },
+
+  
   backText: {
     color: 'white',
     fontWeight: '600',
