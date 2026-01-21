@@ -1,18 +1,43 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 //import { Animated, Pressable } from 'react-native';
+import { useState } from 'react';
+import { strings } from '../src/i18n/strings';
+
+
+
+
 
 
 
 export default function HomeScreen() {
+
+const [lang, setLang] = useState('en');
+const t = strings[lang];
+
   return (
+
+    
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>🚌 Addis Ababa Bus Guide</Text>
-        <Text style={styles.subtitle}>Your complete city bus directory</Text>
-      </View>
+  <View style={{ width: 60 }} />
+
+  <Text style={styles.title}>{t.homeTitle}</Text>
+
+  <TouchableOpacity
+    onPress={() => setLang(lang === 'en' ? 'am' : 'en')}
+    style={styles.langToggle}
+  >
+    <Text style={styles.langText}>
+      {lang === 'en' ? 'EN | አማ' : 'አማ | EN'}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+
+     
+
 
       {/* Quick Actions - SIMPLIFIED */}
       <View style={styles.actionsContainer}>
@@ -288,4 +313,31 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 4,
   },
+  langToggle: {
+  backgroundColor: 'rgba(255,255,255,0.25)',
+  paddingHorizontal: 4,
+  paddingVertical: 10,
+  borderRadius: 20,
+},
+
+langText: {
+  color: 'white',
+  fontWeight: '700',
+  fontSize: 14,
+  langToggle: {
+  backgroundColor: 'rgba(255,255,255,0.25)',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 20,
+},
+
+langText: {
+  color: 'white',
+  fontWeight: '700',
+  fontSize: 14,
+  lineHeight: 16,
+},
+
+},
+
 });
