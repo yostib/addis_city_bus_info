@@ -2,45 +2,36 @@ import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen 
-        name="index" 
-        options={{ 
-          title: 'Addis Bus Guide',
-          headerShown: false  // Hide header on home (we'll make our own)
-        }} 
+    <Stack initialRouteName="splash"> {/* <-- This ensures splash is first */}
+      <Stack.Screen
+        name="splash"
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-        name="bus-list" 
-        options={{ 
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="bus-list"
+        options={{
           title: 'All Buses',
           headerShown: true,
-          headerBackTitle: 'Back',  // For iOS
-          headerTintColor: '#FFF',  // Back button color
-          headerStyle: {
-            backgroundColor: '#2C3E50',
-          },
-          headerTitleStyle: {
-            color: '#FFF',
-            fontWeight: 'bold',
-          }
-        }} 
+          headerBackTitle: 'Back',
+          headerTintColor: '#FFF',
+          headerStyle: { backgroundColor: '#2C3E50' },
+          headerTitleStyle: { color: '#FFF', fontWeight: 'bold' },
+        }}
       />
-      <Stack.Screen 
-        name="bus-detail/[id]" 
-        options={{ 
+      <Stack.Screen
+        name="bus-detail/[id]"
+        options={{
           title: 'Bus Details',
           headerShown: true,
           headerBackTitle: 'Back',
           headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#2C3E50',
-          },
-          headerTitleStyle: {
-            color: '#FFF',
-            fontWeight: 'bold',
-          }
-        }} 
+          headerStyle: { backgroundColor: '#2C3E50' },
+          headerTitleStyle: { color: '#FFF', fontWeight: 'bold' },
+        }}
       />
     </Stack>
   );
