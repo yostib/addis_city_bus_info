@@ -24,6 +24,11 @@ const t = strings[lang];
   <View style={{ width: 60 }} />
 
   <Text style={styles.title}>{t.homeTitle}</Text>
+  
+
+
+
+  
 
   <TouchableOpacity
     onPress={() => setLang(lang === 'en' ? 'am' : 'en')}
@@ -32,6 +37,9 @@ const t = strings[lang];
     <Text style={styles.langText}>
       {lang === 'en' ? 'EN | አማ' : 'አማ | EN'}
     </Text>
+
+    
+
   </TouchableOpacity>
 </View>
 
@@ -46,7 +54,8 @@ const t = strings[lang];
           <TouchableOpacity style={styles.cardButton}>
             <View style={[styles.accent, { backgroundColor: '#1E8449' }]} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>🚌 Browse All Buses</Text>
+              <Text style={styles.cardTitle}>🚌 {t.browseBuses}</Text>
+
               <Text style={styles.cardSubtext}>View all 112 bus routes</Text>
             </View>
           </TouchableOpacity>
@@ -56,7 +65,8 @@ const t = strings[lang];
           <TouchableOpacity style={styles.cardButton}>
             <View style={[styles.accent, { backgroundColor: '#F1C40F' }]} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>🔍 Search by Number</Text>
+              
+              <Text style={styles.cardTitle}>🔍 {t.searchRoute}</Text>
               <Text style={styles.cardSubtext}>Find a specific bus</Text>
             </View>
           </TouchableOpacity>
@@ -66,7 +76,8 @@ const t = strings[lang];
           <TouchableOpacity style={styles.cardButton}>
             <View style={[styles.accent, { backgroundColor: '#C0392B' }]} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>🔍 Search by Route</Text>
+              
+              <Text style={styles.cardTitle}>🔍 {t.searchRoute}</Text>
               <Text style={styles.cardSubtext}>Your frequent buses</Text>
             </View>
           </TouchableOpacity>
@@ -77,7 +88,8 @@ const t = strings[lang];
           <TouchableOpacity style={styles.cardButton}>
             <View style={[styles.accent, { backgroundColor: '#C0392B' }]} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>⭐ Saved Routes</Text>
+              
+              <Text style={styles.cardTitle}>⭐ {t.savedRoutes}</Text>
               <Text style={styles.cardSubtext}>Your frequent buses</Text>
             </View>
           </TouchableOpacity>
@@ -87,7 +99,8 @@ const t = strings[lang];
           <TouchableOpacity style={styles.cardButton}>
             <View style={[styles.accent, { backgroundColor: '#C0392B' }]} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>📍 Where to</Text>
+              
+              <Text style={styles.cardTitle}>📍 {t.whereTo}</Text>
               <Text style={styles.cardSubtext}>where do you want to go?</Text>
             </View>
           </TouchableOpacity>
@@ -97,20 +110,26 @@ const t = strings[lang];
 
       {/* App Features */}
       <View style={styles.featuresContainer}>
-        <Text style={styles.sectionTitle}>App Features</Text>
+  <Text style={styles.sectionTitle}>{t.featuresTitle}</Text>
 
-        {features.map((item, index) => (
-          <View key={index} style={styles.featureItem}>
-            <View style={[styles.featureIcon, { backgroundColor: item.color }]}>
-              <Text style={styles.featureIconText}>{item.icon}</Text>
-            </View>
-            <View style={styles.featureText}>
-              <Text style={styles.featureTitle}>{item.title}</Text>
-              <Text style={styles.featureDescription}>{item.description}</Text>
-            </View>
-          </View>
-        ))}
+  {features.map((item, index) => (
+    <View key={index} style={styles.featureItem}>
+      <View style={[styles.featureIcon, { backgroundColor: item.color }]}>
+        <Text style={styles.featureIconText}>{item.icon}</Text>
       </View>
+
+      <View style={styles.featureText}>
+        <Text style={styles.featureTitle}>
+          {t.features[index].title}
+        </Text>
+        <Text style={styles.featureDescription}>
+          {t.features[index].description}
+        </Text>
+      </View>
+    </View>
+  ))}
+</View>
+
 
       {/* Stats */}
       <View style={styles.statsContainer}>
@@ -142,31 +161,12 @@ const t = strings[lang];
 
 /* Feature Data */
 const features = [
-  {
-    icon: '🚌',
-    title: 'Complete Bus Directory',
-    description: 'All 112 city bus routes with detailed information',
-    color: '#1E8449',
-  },
-  {
-    icon: '🔍',
-    title: 'Smart Search',
-    description: 'Find buses by number, route, or location',
-    color: '#F1C40F',
-  },
-  {
-    icon: '📱',
-    title: 'Works Offline',
-    description: 'No internet needed after first load',
-    color: '#27AE60',
-  },
-  {
-    icon: '💵',
-    title: 'Fare Information',
-    description: 'Exact bus fares and distance',
-    color: '#C0392B',
-  },
+  { icon: '🚌', color: '#1E8449' },
+  { icon: '🔍', color: '#F1C40F' },
+  { icon: '📱', color: '#27AE60' },
+  { icon: '💵', color: '#C0392B' },
 ];
+
 
 /* Styles */
 const styles = StyleSheet.create({

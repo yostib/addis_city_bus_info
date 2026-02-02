@@ -20,6 +20,7 @@ export default function BusListScreen() {
   const [buses] = useState(sampleBusData);
   const router = useRouter(); // ✅ This creates the router object
   const [savedRoutes, setSavedRoutes] = useState([]);
+  
 
   // Filter buses based on search
   const filteredBuses = buses.filter(bus => 
