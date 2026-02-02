@@ -2,6 +2,7 @@ export const strings = {
   en: {
     homeTitle: 'Addis Bus Guide',
     browseBuses: 'Browse All Buses',
+    searchByBusNumber: 'Search by Number',
     searchRoute: 'Search by Route',
     savedRoutes: 'Saved Routes',
     whereTo: 'Where to',
@@ -29,7 +30,8 @@ export const strings = {
   am: {
     homeTitle: 'የአዲስ አበባ አውቶቡስ መመሪያ',
     browseBuses: 'ሁሉንም አውቶቡሶች ይመልከቱ',
-    searchRoute: 'በመንገድ ፈልግ',
+    searchByBusNumber: 'በቁጥር ፈልግ/ጊ',
+    searchRoute: 'በመንገድ ፈልግ/ጊ',
     savedRoutes: 'የተቀመጡ መንገዶች',
     whereTo: 'ወዴት መሄድ ይፈልጋሉ?',
     AppFeatures: 'የመተግበሪያ ባህሪያት',
