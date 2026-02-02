@@ -25,6 +25,16 @@ export const strings = {
         description: 'Exact bus fares and distance',
       },
     ],
+
+    stats: {
+      routes:  'Bus routes',
+      offline: 'offline access',
+      access:  'Access',
+    },
+    footer: {
+      tagline: 'Made for Addis Ababa residents • Updated regularly',
+      version: 'all data offline • Version 1.0',
+    },
   },
 
   am: {
@@ -54,5 +64,14 @@ export const strings = {
         description: 'ትክክለኛ የአውቶቡስ ክፍያ እና ርቀት',
       },
     ],
+    stats: {
+      routes: 'የአውቶቡስ መስመሮች',
+      offline: 'ከኢንተርኔት ውጭ',
+      access: 'ሁልጊዜ ይገኛል',
+    },
+    footer: {
+      tagline: 'ለአዲስ አበባ ነዋሪዎች የተዘጋጀ • በየጊዜው የሚዘመን',
+      version: 'ስሪት 1.0 • ሁሉም መረጃ ከመስመር ውጭ',
+    },
   },
 };

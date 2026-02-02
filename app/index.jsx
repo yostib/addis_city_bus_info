@@ -130,24 +130,24 @@ const toggleLang = async () => {
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>112</Text>
-          <Text style={styles.statLabel}>Bus Routes</Text>
+          <Text style={styles.statLabel}>{t.stats.routes}</Text>
+
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>100%</Text>
-          <Text style={styles.statLabel}>Offline</Text>
+          <Text style={styles.statLabel}>{t.stats.offline}</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>24/7</Text>
-          <Text style={styles.statLabel}>Access</Text>
+          <Text style={styles.statLabel}>{t.stats.access}</Text>
         </View>
       </View>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Made for Addis Ababa residents • Updated regularly
-        </Text>
-        <Text style={styles.versionText}>Version 1.0 • All data offline</Text>
+        <Text style={styles.footerText}>{t.footer.tagline}</Text>
+<Text style={styles.versionText}>{t.footer.version}</Text>
+
       </View>
     </ScrollView>
   );
