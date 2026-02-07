@@ -2,34 +2,48 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  StyleSheet,
+  SafeAreaView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import busData from '../src/data/busData';
-import { Keyboard } from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
+import { strings } from '../src/i18n/strings';
 
-const allStops = Array.from(
-  new Set(busData.flatMap(bus => bus.route))
-);
+import busData from '../src/data/busData';
+//import styles from '../styles/routeSearchStyles'; // or wherever your styles are
 
 export default function RouteSearchScreen() {
   const router = useRouter();
 
+  const [lang, setLang] = useState('en');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [results, setResults] = useState([]);
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
   const [validatedFrom, setValidatedFrom] = useState(null);
+  const [savedRoutes, setSavedRoutes] = useState([]);
 
+  // 🔤 Load language
+  useEffect(() => {
+    AsyncStorage.getItem('lang').then(stored => {
+      if (stored) setLang(stored);
+    });
+  }, []);
+
+  const t = strings[lang].routeSearch;
+
+  const allStops = Array.from(
+    new Set(busData.flatMap(bus => bus.route))
+  );
 
   const getValidDestinations = (fromStop) => {
     const destinations = new Set();
@@ -37,7 +51,9 @@ export default function RouteSearchScreen() {
     busData.forEach(bus => {
       const idx = bus.route.indexOf(fromStop);
       if (idx !== -1) {
-        bus.route.slice(idx + 1).forEach(stop => destinations.add(stop));
+        bus.route.slice(idx + 1).forEach(stop =>
+          destinations.add(stop)
+        );
       }
     });
 
@@ -60,31 +76,22 @@ export default function RouteSearchScreen() {
     setResults(matches);
   };
 
-  const [savedRoutes, setSavedRoutes] = useState([]);
+  useEffect(() => {
+    AsyncStorage.getItem('savedRoutes').then(saved => {
+      if (saved) setSavedRoutes(JSON.parse(saved));
+    });
+  }, []);
 
-useEffect(() => {
-  const loadSaved = async () => {
-    const saved = await AsyncStorage.getItem('savedRoutes');
-    if (saved) setSavedRoutes(JSON.parse(saved));
+  const isSaved = id => savedRoutes.includes(id);
+
+  const toggleSave = async id => {
+    const updated = isSaved(id)
+      ? savedRoutes.filter(r => r !== id)
+      : [...savedRoutes, id];
+
+    setSavedRoutes(updated);
+    await AsyncStorage.setItem('savedRoutes', JSON.stringify(updated));
   };
-  loadSaved();
-}, []);
-
-const isSaved = (id) => savedRoutes.includes(id);
-
-const toggleSave = async (id) => {
-  let updated;
-
-  if (savedRoutes.includes(id)) {
-    updated = savedRoutes.filter(item => item !== id);
-  } else {
-    updated = [...savedRoutes, id];
-  }
-
-  setSavedRoutes(updated);
-  await AsyncStorage.setItem('savedRoutes', JSON.stringify(updated));
-};
-
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -93,29 +100,30 @@ const toggleSave = async (id) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          keyboardShouldPersistTaps="always"
-          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 40 }}
         >
           {/* Header */}
           <View style={styles.customHeader}>
             <TouchableOpacity onPress={() => router.back()}>
               <Text style={styles.backText}>← Back</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Find a Bus Route</Text>
-            <View style={{ width: 60 }} />
-          </View>
 
-          
+            <Text style={styles.headerTitle}>{t.title}</Text>
+
+            <View style={{ width: 50 }} />
+          </View>
 
           <View style={styles.form}>
             {/* FROM */}
-            <Text style={styles.label}>From</Text>
+            <Text style={styles.label}>{t.from}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Starting location"
+              placeholder={t.fromPlaceholder}
               value={from}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setFrom(text);
+                setValidatedFrom(null);
                 setTo('');
                 setResults([]);
 
@@ -135,30 +143,29 @@ const toggleSave = async (id) => {
             />
 
             {fromSuggestions.map((item, idx) => (
-  <TouchableOpacity
-    key={idx}
-    style={styles.suggestionItem}
-    onPress={() => {
-      setFrom(item);             // sets the visible FROM input
-      setValidatedFrom(item);    // ✅ store the validated FROM for TO suggestions
-      setFromSuggestions([]);    // clear FROM suggestions
-      setTo('');                 // clear TO input
-      setToSuggestions([]);      // clear TO suggestions
-      setResults([]);            // clear previous search results if any
-    }}
-  >
-    <Text style={styles.suggestionText}>{item}</Text>
-  </TouchableOpacity>
-))}
-
+              <TouchableOpacity
+                key={idx}
+                style={styles.suggestionItem}
+                onPress={() => {
+                  setFrom(item);
+                  setValidatedFrom(item);
+                  setFromSuggestions([]);
+                  setTo('');
+                  setToSuggestions([]);
+                  setResults([]);
+                }}
+              >
+                <Text style={styles.suggestionText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
 
             {/* TO */}
-            <Text style={styles.label}>To</Text>
+            <Text style={styles.label}>{t.to}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Destination"
+              placeholder={t.toPlaceholder}
               value={to}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setTo(text);
                 setResults([]);
 
@@ -169,7 +176,6 @@ const toggleSave = async (id) => {
 
                 setToSuggestions(
                   getValidDestinations(validatedFrom)
-
                     .filter(s =>
                       s.toLowerCase().includes(text.toLowerCase())
                     )
@@ -191,48 +197,53 @@ const toggleSave = async (id) => {
               </TouchableOpacity>
             ))}
 
-
-
-            <TouchableOpacity style={styles.searchButton} onPress={() => {Keyboard.dismiss(); searchRoutes();}}>
-              <Text style={styles.searchText}>Search Routes</Text>
+            <TouchableOpacity
+              style={styles.searchButton}
+              onPress={() => {
+                Keyboard.dismiss();
+                searchRoutes();
+              }}
+            >
+              <Text style={styles.searchText}>{t.search}</Text>
             </TouchableOpacity>
 
-
-
             {results.map(bus => (
-  <TouchableOpacity
-    key={bus.id}
-    style={styles.busCard}
-    onPress={() => router.push(`/bus-detail/${bus.id}`)}
-  >
-    <View style={styles.busHeader}>
-      <View style={styles.busNumber}>
-        <Text style={styles.busNumberText}>{bus.number}</Text>
-      </View>
+              <TouchableOpacity
+                key={bus.id}
+                style={styles.busCard}
+                onPress={() =>
+                  router.push(`/bus-detail/${bus.id}`)
+                }
+              >
+                <View style={styles.busHeader}>
+                  <View style={styles.busNumber}>
+                    <Text style={styles.busNumberText}>
+                      {bus.number}
+                    </Text>
+                  </View>
 
-      <View style={styles.busInfo}>
-        <Text style={styles.busName}>{bus.name}</Text>
-        <Text style={styles.busRoute}>
-          {bus.start} → {bus.end}
-        </Text>
-      </View>
+                  <View style={styles.busInfo}>
+                    <Text style={styles.busName}>{bus.name}</Text>
+                    <Text style={styles.busRoute}>
+                      {bus.start} → {bus.end}
+                    </Text>
+                  </View>
 
-      <TouchableOpacity
-        onPress={() => toggleSave(bus.id)}
-        hitSlop={10}
-      >
-        <Text style={{ fontSize: 22 }}>
-          {isSaved(bus.id) ? '⭐' : '☆'}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  </TouchableOpacity>
-))}
-
-
+                  <TouchableOpacity
+                    onPress={() => toggleSave(bus.id)}
+                  >
+                    <Text style={{ fontSize: 22 }}>
+                      {isSaved(bus.id) ? '⭐' : '☆'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            ))}
 
             {results.length === 0 && from && to && (
-              <Text style={styles.noResult}>No matching routes found</Text>
+              <Text style={styles.noResult}>
+                {t.noResults}
+              </Text>
             )}
           </View>
         </ScrollView>

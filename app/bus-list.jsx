@@ -11,6 +11,7 @@ import { Link, useRouter } from 'expo-router'; // ✅ Added useRouter
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import sampleBusData from '../src/data/busData';
+import { strings } from '../src/i18n/strings';
 
 const [savedRoutes, setSavedRoutes] = useState([]);
 
@@ -30,6 +31,18 @@ export default function BusListScreen() {
     bus.end.toLowerCase().includes(searchText.toLowerCase()) ||
     bus.through.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  // Load saved routes on mount
+  const [lang, setLang] = useState('en');
+
+useEffect(() => {
+  AsyncStorage.getItem('lang').then(stored => {
+    if (stored) setLang(stored);
+  });
+}, []);
+
+const t = strings[lang].busList;
+
 
   useEffect(() => {
   const loadSavedRoutes = async () => {
@@ -112,7 +125,7 @@ const toggleSavedRoute = async (busId) => {
           onPress={() => router.back()}> 
           <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.customHeaderTitle}>City Buses</Text>
+        <Text style={styles.customHeaderTitle}>{t.title}</Text>
         <TouchableOpacity 
           style={styles.homeButton}
           onPress={() => router.push('/')}> 

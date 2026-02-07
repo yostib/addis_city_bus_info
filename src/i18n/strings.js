@@ -7,6 +7,19 @@ export const strings = {
     savedRoutes: 'Saved Routes',
     whereTo: 'Where to',
     featuresTitle: 'App Features',
+
+    routeSearch: {
+      title: "Search by Route",
+      from: "From",
+      to: "To",
+      fromPlaceholder: "Starting location",
+      toPlaceholder: "Destination",
+      search: "Search Buses",
+      noResults: "No buses found for this route",
+    },
+    busList: {
+      title: 'All Buses',
+    },
     features: [
       {
         title: 'Complete Bus Directory',
@@ -25,11 +38,10 @@ export const strings = {
         description: 'Exact bus fares and distance',
       },
     ],
-
     stats: {
-      routes:  'Bus routes',
+      routes: 'Bus routes',
       offline: 'offline access',
-      access:  'Access',
+      access: 'Access',
     },
     footer: {
       tagline: 'Made for Addis Ababa residents • Updated regularly',
@@ -73,5 +85,18 @@ export const strings = {
       tagline: 'ለአዲስ አበባ ነዋሪዎች የተዘጋጀ • በየጊዜው የሚዘመን',
       version: 'ስሪት 1.0 • ሁሉም መረጃ ከመስመር ውጭ',
     },
+    routeSearch: {
+      title: "መንገድ ፈልግ",
+      from: "መነሻ",
+      to: "መድረሻ",
+      fromPlaceholder: "መነሻ ቦታ",
+      toPlaceholder: "መድረሻ",
+      search: "አውቶቢስ ፈልግ",
+      noResults: "ለዚህ መንገድ ባስ አልተገኘም",
+    },
+    busList: {
+      title: 'ሁሉም አውቶቡሶች',
+    },
+  
   },
 };
