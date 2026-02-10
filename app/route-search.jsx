@@ -106,7 +106,7 @@ export default function RouteSearchScreen() {
           {/* Header */}
           <View style={styles.customHeader}>
             <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.backText}>← Back</Text>
+              <Text style={styles.backText}>← {t.back}</Text>
             </TouchableOpacity>
 
             <Text style={styles.headerTitle}>{t.title}</Text>

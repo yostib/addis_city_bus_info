@@ -12,6 +12,7 @@ export const strings = {
       title: "Search by Route",
       from: "From",
       to: "To",
+      back: "Back",
       fromPlaceholder: "Starting location",
       toPlaceholder: "Destination",
       search: "Search Buses",
@@ -19,6 +20,16 @@ export const strings = {
     },
     busList: {
       title: 'All Buses',
+      back: 'Back',
+      home: 'Home',
+    },
+    savedRoutesScreen: {
+      title: 'የተቀመጡ መንገዶች',
+      back: 'ተመለስ',
+      home: 'መነሻ',
+      emptyTitle: 'እስካሁን የተቀመጡ መንገዶች የሉም',
+      emptySubtitle: 'መንገድን ⭐ በመጫን እዚህ ይታያል',
+      remove: 'አስወግድ',
     },
     features: [
       {
@@ -89,6 +100,7 @@ export const strings = {
       title: "መንገድ ፈልግ",
       from: "መነሻ",
       to: "መድረሻ",
+      back: "ተመለስ",
       fromPlaceholder: "መነሻ ቦታ",
       toPlaceholder: "መድረሻ",
       search: "አውቶቢስ ፈልግ",
@@ -96,6 +108,16 @@ export const strings = {
     },
     busList: {
       title: 'ሁሉም አውቶቡሶች',
+      back: 'ተመለስ',
+      home: 'መነሻ',
+    },
+     savedRoutesScreen: {
+      title: 'የተቀመጡ መንገዶች',
+      back: 'ተመለስ',
+      home: 'መነሻ',
+      emptyTitle: 'እስካሁን የተቀመጡ መንገዶች የሉም',
+      emptySubtitle: 'መንገድን ⭐ በመጫን እዚህ ይታያል',
+      remove: 'አስወግድ',
     },
   
   },

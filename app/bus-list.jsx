@@ -123,13 +123,13 @@ const toggleSavedRoute = async (busId) => {
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}> 
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← {t.back}</Text>
         </TouchableOpacity>
         <Text style={styles.customHeaderTitle}>{t.title}</Text>
         <TouchableOpacity 
           style={styles.homeButton}
           onPress={() => router.push('/')}> 
-          <Text style={styles.homeButtonText}>Home</Text>
+          <Text style={styles.homeButtonText}>{t.home}</Text>
         </TouchableOpacity>
       </View>
 
