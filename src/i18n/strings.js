@@ -31,6 +31,14 @@ export const strings = {
       emptySubtitle: 'መንገድን ⭐ በመጫን እዚህ ይታያል',
       remove: 'አስወግድ',
     },
+    findDestination: {
+  title: "Find Your Destination",
+  back: "Back",
+  destinationLabel: "Destination",
+  destinationPlaceholder: "Type destination (e.g. Merkato)",
+  showBuses: "Show Buses",
+},
+    
     features: [
       {
         title: 'Complete Bus Directory',
@@ -118,6 +126,13 @@ export const strings = {
       emptyTitle: 'እስካሁን የተቀመጡ መንገዶች የሉም',
       emptySubtitle: 'መንገድን ⭐ በመጫን እዚህ ይታያል',
       remove: 'አስወግድ',
+    },
+    findDestination: {
+      title: "መድረሻ ፈልግ",
+      back: "ተመለስ",
+      destinationLabel: "መድረሻ",
+      destinationPlaceholder: "መድረሻ ያስገቡ (ለምሳሌ መርካቶ)",
+      showBuses: "አውቶቢሶች አሳይ",
     },
   
   },
