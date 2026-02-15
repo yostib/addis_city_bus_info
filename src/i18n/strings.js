@@ -1,7 +1,7 @@
 export const strings = {
   en: {
     homeTitle: 'Addis Bus Guide',
-    browseBuses: 'Browse All Buses',
+    browseBuses: 'Bus Guide & Tips',
     searchByBusNumber: 'Search by Number',
     searchRoute: 'Search by Route',
     savedRoutes: 'Saved Routes',
@@ -38,6 +38,34 @@ export const strings = {
   destinationPlaceholder: "Type destination (e.g. Merkato)",
   showBuses: "Show Buses",
 },
+busGuide: {
+  title: "Bus Guide & Tips",
+  back: "Back",
+
+  howToRide: "How to Ride",
+  howToRideText:
+    "Wait at marked bus stops.\n" +
+    "Enter from the front and exit from the back.\n" +
+    "Keep small cash ready before boarding.",
+
+  peakHours: "Peak Hours",
+  peakHoursText:
+    "Morning: 1:00 – 3:00 AM\n" +
+    "Evening: 10:00 – 1:00 PM\n" +
+    "Expect crowded buses during these times.",
+
+  savingRoutes: "Saving Routes",
+  savingRoutesText:
+    "Tap the star icon on any bus to save it.\n" +
+    "Access your saved buses quickly from the Saved Routes screen.",
+
+  safetyTips: "Safety Tips",
+  safetyTipsText:
+    "Keep your bags in front of you.\n" +
+    "Avoid empty buses late at night.\n" +
+    "Always confirm the bus number before boarding."
+},
+
     
     features: [
       {
@@ -70,7 +98,7 @@ export const strings = {
 
   am: {
     homeTitle: 'የአዲስ አበባ አውቶቡስ መመሪያ',
-    browseBuses: 'ሁሉንም አውቶቡሶች ይመልከቱ',
+    browseBuses: 'የአውቶቡስ መመሪያ እና ምክሮች',
     searchByBusNumber: 'በቁጥር ፈልግ/ጊ',
     searchRoute: 'በመንገድ ፈልግ/ጊ',
     savedRoutes: 'የተቀመጡ መንገዶች',
@@ -134,6 +162,34 @@ export const strings = {
       destinationPlaceholder: "መድረሻ ያስገቡ (ለምሳሌ መርካቶ)",
       showBuses: "አውቶቢሶች አሳይ",
     },
+    busGuide: {
+  title: "የአውቶቡስ መመሪያ & ምክሮች",
+  back: "ተመለስ",
+
+  howToRide: "እንዴት መጓዝ",
+  howToRideText:
+    "በተመረጡ መቆሚያዎች ይጠብቁ።\n" +
+    "ከፊት ይግቡ ከኋላ ይውጡ።\n" +
+    "ትንሽ ገንዘብ አዘጋጁ።",
+
+  peakHours: "የተጨናነቀ ሰዓት",
+  peakHoursText:
+    "ጠዋት: 1:00 – 3:00 AM\n" +
+    "ምሽት: 10:00 – 1:00 PM\n" +
+    "በእነዚህ ሰዓታት ብዙ ሰዎች ይኖራሉ።",
+
+  savingRoutes: "መንገዶችን ማስቀመጥ",
+  savingRoutesText:
+    "በአውቶቡስ ላይ ⭐ ይጫኑ።\n" +
+    "በSaved Routes ፈጣን መዳረሻ ያግኙ።",
+
+  safetyTips: "የደህንነት ምክሮች",
+  safetyTipsText:
+    "ቦርሳዎን ከፊት ይያዙ።\n" +
+    "ምሽት ባዶ አውቶቡስ አይግቡ።\n" +
+    "ቁጥሩን አረጋግጡ።"
+}
+
   
   },
 };

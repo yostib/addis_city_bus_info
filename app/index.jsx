@@ -54,7 +54,7 @@ const toggleLang = async () => {
 
       {/* Quick Actions - SIMPLIFIED */}
       <View style={styles.actionsContainer}>
-        <Link href="/bus-list" asChild>
+        <Link href="/bus-guide" asChild>
           <TouchableOpacity style={styles.cardButton}>
             <View style={[styles.accent, { backgroundColor: "#1E8449" }]} />
             <View style={styles.cardContent}>
