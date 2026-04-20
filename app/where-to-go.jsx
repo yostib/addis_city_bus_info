@@ -1,45 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Keyboard,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import busData from '../src/data/busData';
-import { strings } from '../src/i18n/strings';
+    Keyboard,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import busData from "../src/data/busData";
+import { strings } from "../src/i18n/strings";
 
-const allStops = Array.from(new Set(busData.flatMap(bus => bus.route)));
+const allStops = Array.from(new Set(busData.flatMap((bus) => bus.route)));
 
 export default function WhereToGoScreen() {
   const router = useRouter();
 
   // 🌍 language (simple + safe)
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState("en");
 
   useEffect(() => {
-    AsyncStorage.getItem('lang').then(storedLang => {
+    AsyncStorage.getItem("lang").then((storedLang) => {
       if (storedLang) setLang(storedLang);
     });
   }, []);
 
-  const t = strings[lang]?.findDestination || strings['en'].findDestination; // ← CHANGED to findDestination
+  const t = strings[lang]?.findDestination || strings["en"].findDestination; // ← CHANGED to findDestination
 
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [results, setResults] = useState([]);
 
   const searchBuses = () => {
     if (!destination) return;
 
-    const matches = busData.filter(bus =>
+    const matches = busData.filter((bus) =>
       bus.route.some(
-        stop => stop.toLowerCase() === destination.toLowerCase()
-      )
+        (stop) => stop.toLowerCase() === destination.toLowerCase(),
+      ),
     );
 
     setResults(matches);
@@ -73,8 +73,8 @@ export default function WhereToGoScreen() {
               return;
             }
 
-            const matches = allStops.filter(stop =>
-              stop.toLowerCase().includes(text.toLowerCase())
+            const matches = allStops.filter((stop) =>
+              stop.toLowerCase().includes(text.toLowerCase()),
             );
 
             setSuggestions(matches.slice(0, 6));
@@ -105,15 +105,24 @@ export default function WhereToGoScreen() {
         </TouchableOpacity>
 
         <ScrollView>
-          {results.map(bus => (
+          {results.map((bus) => (
             <TouchableOpacity
               key={bus.id}
               style={styles.busCard}
               onPress={() => router.push(`/bus-detail/${bus.id}`)}
             >
-              <Text>{bus.number} — {bus.name}</Text>
+              <Text style={styles.busCardTitle}>
+                {bus.number} — {bus.name}
+              </Text>
+              <Text style={styles.busCardSubtitle}>
+                {bus.start} → {bus.end}
+              </Text>
             </TouchableOpacity>
           ))}
+
+          {results.length === 0 && destination.length > 0 && (
+            <Text style={styles.noResults}>{t.noResults}</Text>
+          )}
         </ScrollView>
       </View>
     </View>
@@ -121,42 +130,57 @@ export default function WhereToGoScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
   header: {
-    backgroundColor: '#1E8449',
+    backgroundColor: "#1E8449",
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  headerTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  headerButton: { color: '#fff', fontSize: 16 },
+  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  headerButton: { color: "#fff", fontSize: 16 },
   form: { padding: 16 },
-  label: { fontWeight: '600', marginBottom: 6 },
+  label: { fontWeight: "600", marginBottom: 6 },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
   },
   suggestion: {
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
     padding: 10,
     borderRadius: 6,
     marginBottom: 4,
   },
   searchButton: {
-    backgroundColor: '#1E8449',
+    backgroundColor: "#1E8449",
     padding: 14,
     borderRadius: 10,
     marginVertical: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  searchText: { color: '#fff', fontWeight: 'bold' },
+  searchText: { color: "#fff", fontWeight: "bold" },
   busCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 14,
     borderRadius: 10,
     marginBottom: 10,
+  },
+  busCardTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1E293B",
+    marginBottom: 4,
+  },
+  busCardSubtitle: {
+    color: "#4B5563",
+  },
+  noResults: {
+    marginTop: 18,
+    color: "#475569",
+    fontSize: 15,
+    textAlign: "center",
   },
 });

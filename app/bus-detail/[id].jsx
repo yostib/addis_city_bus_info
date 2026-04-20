@@ -1,101 +1,100 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView,
-  TouchableOpacity
-} from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
-import busData from '../../src/data/busData';
+import busData from "../../src/data/busData";
+import { strings } from "../../src/i18n/strings";
 
 export default function BusDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
-  const bus = busData.find(b => b.id === id);
-
-  // ✅ Saved routes state
+  const [lang, setLang] = useState("en");
   const [savedRoutes, setSavedRoutes] = useState([]);
 
-  // ✅ Load saved routes from AsyncStorage
+  const t = strings[lang]?.busDetail || strings.en.busDetail;
+  const bus = busData.find((b) => b.id === id);
+
   useEffect(() => {
+    AsyncStorage.getItem("lang").then((savedLang) => {
+      if (savedLang) setLang(savedLang);
+    });
+
     const loadSavedRoutes = async () => {
-      const saved = await AsyncStorage.getItem('savedRoutes');
+      const saved = await AsyncStorage.getItem("savedRoutes");
       if (saved) setSavedRoutes(JSON.parse(saved));
     };
+
     loadSavedRoutes();
   }, []);
 
-  // ✅ Toggle save / remove route
   const toggleSaveRoute = async () => {
-    let updatedRoutes = [];
-    if (savedRoutes.includes(bus.id)) {
-      updatedRoutes = savedRoutes.filter(rid => rid !== bus.id);
-    } else {
-      updatedRoutes = [...savedRoutes, bus.id];
-    }
+    if (!bus) return;
+
+    const updatedRoutes = savedRoutes.includes(bus.id)
+      ? savedRoutes.filter((rid) => rid !== bus.id)
+      : [...savedRoutes, bus.id];
+
     setSavedRoutes(updatedRoutes);
-    await AsyncStorage.setItem('savedRoutes', JSON.stringify(updatedRoutes));
+    await AsyncStorage.setItem("savedRoutes", JSON.stringify(updatedRoutes));
   };
 
-  // ✅ Handle bus not found
   if (!bus) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Bus not found</Text>
-        <Text style={styles.errorSubtext}>Bus ID: {id}</Text>
+        <Text style={styles.errorText}>{t.busNotFound}</Text>
+        <Text style={styles.errorSubtext}>
+          {t.busId} {id}
+        </Text>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-
-      {/* Custom Header */}
       <View style={styles.customHeader}>
         <TouchableOpacity
           style={[styles.navButton, styles.backBtn]}
           onPress={() => router.back()}
         >
-          <Text style={styles.navButtonText}>← Back</Text>
+          <Text style={styles.navButtonText}>← {t.back}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.navButton, styles.centerBtn]}
-          onPress={() => router.push('/bus-list')}
-        >
-          <Text style={styles.navButtonText}>City Buses</Text>
-        </TouchableOpacity>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>{bus.number}</Text>
+          <Text style={styles.headerSubtitle}>{bus.name}</Text>
+        </View>
 
         <TouchableOpacity
           style={[styles.navButton, styles.homeBtn]}
-          onPress={() => router.push('/')}
+          onPress={() => router.push("/")}
         >
-          <Text style={styles.navButtonText}>Home</Text>
+          <Text style={styles.navButtonText}>{t.home}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Save / Remove Button */}
       <TouchableOpacity
         onPress={toggleSaveRoute}
-        style={{
-          backgroundColor: savedRoutes.includes(bus.id) ? '#E74C3C' : '#27AE60',
-          padding: 10,
-          borderRadius: 8,
-          margin: 15,
-          alignItems: 'center'
-        }}
+        style={[
+          styles.actionButton,
+          savedRoutes.includes(bus.id)
+            ? styles.removeButton
+            : styles.saveButton,
+        ]}
       >
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>
-          {savedRoutes.includes(bus.id) ? 'Remove from Saved' : 'Save Route'}
+        <Text style={styles.actionButtonText}>
+          {savedRoutes.includes(bus.id) ? t.removeSaved : t.saveRoute}
         </Text>
       </TouchableOpacity>
 
-      {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.headerCard}>
         <View style={styles.busNumberLarge}>
           <Text style={styles.busNumberText}>{bus.number}</Text>
         </View>
@@ -107,159 +106,219 @@ export default function BusDetailScreen() {
         </View>
       </View>
 
-      {/* Route Details */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Route Details</Text>
+        <Text style={styles.sectionTitle}>{t.routeDetails}</Text>
         <View style={styles.routeStep}>
           <View style={[styles.stepIcon, styles.startIcon]}>
             <Text style={styles.stepText}>S</Text>
           </View>
           <View style={styles.stepInfo}>
-            <Text style={styles.stepTitle}>Starting Point</Text>
+            <Text style={styles.stepTitle}>{t.startingPoint}</Text>
             <Text style={styles.stepLocation}>{bus.start}</Text>
           </View>
         </View>
+
         <View style={styles.routeStep}>
           <View style={[styles.stepIcon, styles.viaIcon]}>
             <Text style={styles.stepText}>V</Text>
           </View>
           <View style={styles.stepInfo}>
-            <Text style={styles.stepTitle}>Via</Text>
+            <Text style={styles.stepTitle}>{t.via}</Text>
             <Text style={styles.stepLocation}>{bus.through}</Text>
           </View>
         </View>
+
         <View style={styles.routeStep}>
           <View style={[styles.stepIcon, styles.endIcon]}>
             <Text style={styles.stepText}>E</Text>
           </View>
           <View style={styles.stepInfo}>
-            <Text style={styles.stepTitle}>Destination</Text>
+            <Text style={styles.stepTitle}>{t.destination}</Text>
             <Text style={styles.stepLocation}>{bus.end}</Text>
           </View>
         </View>
       </View>
 
-      {/* Trip Info */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Trip Information</Text>
+        <Text style={styles.sectionTitle}>{t.tripInfo}</Text>
         <View style={styles.infoRow}>
           <View style={styles.infoBox}>
-            <Text style={styles.infoLabel}>Fare</Text>
+            <Text style={styles.infoLabel}>{t.fare}</Text>
             <Text style={styles.infoValue}>{bus.fare}</Text>
           </View>
           <View style={styles.infoBox}>
-            <Text style={styles.infoLabel}>Distance</Text>
+            <Text style={styles.infoLabel}>{t.distance}</Text>
             <Text style={styles.infoValue}>{bus.distance}</Text>
           </View>
         </View>
       </View>
 
-      {/* Stops */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Full Route Stops</Text>
+        <Text style={styles.sectionTitle}>{t.fullRouteStops}</Text>
         {bus.route.map((stop, index) => (
           <View key={index} style={styles.stopItem}>
-            <Text style={styles.stopNumber}>{index + 1}</Text>
+            <View style={styles.stopNumber}>
+              <Text style={styles.stopNumberText}>{index + 1}</Text>
+            </View>
             <Text style={styles.stopName}>{stop}</Text>
           </View>
         ))}
       </View>
 
       <View style={styles.noteBox}>
-        <Text style={styles.noteText}>
-          ℹ️ This app works offline. All data is stored on your device.
-        </Text>
+        <Text style={styles.noteText}>{t.offlineNote}</Text>
       </View>
     </ScrollView>
   );
 }
 
-// ✅ Keep your styles the same
-
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#F4F6F8",
   },
-  header: {
-  backgroundColor: '#2C3E50', // Change this to:
-  backgroundColor: '#1E8449', // Your green color
-  padding: 20,
-  flexDirection: 'row',
-  alignItems: 'center',
-
+  customHeader: {
+    backgroundColor: "#1E8449",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 44,
+    paddingBottom: 14,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  headerSubtitle: {
+    color: "#D5E8D4",
+    fontSize: 12,
+  },
+  navButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    minWidth: 80,
+    alignItems: "center",
+  },
+  backBtn: {
+    backgroundColor: "#145A32",
+  },
+  homeBtn: {
+    backgroundColor: "#196F3D",
+  },
+  navButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  actionButton: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    padding: 14,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+  saveButton: {
+    backgroundColor: "#1E8449",
+  },
+  removeButton: {
+    backgroundColor: "#C0392B",
+  },
+  actionButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  headerCard: {
+    backgroundColor: "#1E8449",
+    margin: 16,
+    borderRadius: 20,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 5,
   },
   busNumberLarge: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: "#E74C3C",
     width: 70,
     height: 70,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 20,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 18,
   },
   busNumberText: {
-    color: 'white',
+    color: "white",
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   routeInfo: {
     flex: 1,
   },
   routeName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 5,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 4,
   },
   routeSubtitle: {
-    fontSize: 14,
-    color: '#BDC3C7',
+    fontSize: 13,
+    color: "#D5E8D4",
   },
   section: {
-    backgroundColor: 'white',
-    margin: 15,
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 16,
+    marginVertical: 10,
     padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
     elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 15,
+    fontWeight: "700",
+    color: "#1E3748",
+    marginBottom: 16,
   },
   routeStep: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
   },
   stepIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
   },
   startIcon: {
-    backgroundColor: '#27AE60',
+    backgroundColor: "#27AE60",
   },
   viaIcon: {
-    backgroundColor: '#3498DB',
+    backgroundColor: "#3498DB",
   },
   endIcon: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: "#E74C3C",
   },
   stepText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "700",
     fontSize: 16,
   },
   stepInfo: {
@@ -267,115 +326,82 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontSize: 12,
-    color: '#7F8C8D',
-    marginBottom: 3,
+    color: "#7B8A99",
+    marginBottom: 4,
   },
   stepLocation: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#2C3E50',
+    color: "#243447",
+    fontWeight: "600",
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   infoBox: {
     flex: 1,
-    alignItems: 'center',
-    padding: 15,
-    backgroundColor: '#F8F9F9',
-    borderRadius: 8,
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 14,
+    backgroundColor: "#F4F7FB",
     marginHorizontal: 5,
   },
   infoLabel: {
-    fontSize: 14,
-    color: '#7F8C8D',
-    marginBottom: 5,
+    color: "#7B8A99",
+    marginBottom: 8,
+    fontSize: 13,
   },
   infoValue: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2C3E50',
+    fontWeight: "700",
+    color: "#1D3557",
   },
   stopItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#ECF0F1',
+    borderBottomColor: "#E9EEF3",
   },
   stopNumber: {
-    backgroundColor: '#BDC3C7',
-    width: 25,
-    height: 25,
-    borderRadius: 12.5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#DDE3EA",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
+  },
+  stopNumberText: {
+    color: "#2C3E50",
+    fontWeight: "700",
   },
   stopName: {
-    fontSize: 16,
-    color: '#34495E',
+    fontSize: 15,
+    color: "#2C3E50",
   },
   noteBox: {
-    backgroundColor: '#EBF5FB',
-    margin: 15,
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 30,
+    backgroundColor: "#E8F5FE",
+    marginHorizontal: 16,
+    marginTop: 10,
+    padding: 16,
+    borderRadius: 14,
   },
   noteText: {
-    fontSize: 14,
-    color: '#3498DB',
-    textAlign: 'center',
+    color: "#1D4F91",
+    lineHeight: 22,
+    textAlign: "center",
   },
   errorText: {
     fontSize: 20,
-    color: '#E74C3C',
-    textAlign: 'center',
+    color: "#E74C3C",
+    textAlign: "center",
     marginTop: 50,
-    fontWeight: 'bold',
+    fontWeight: "700",
   },
   errorSubtext: {
-    fontSize: 14,
-    color: '#7F8C8D',
-    textAlign: 'center',
     marginTop: 10,
+    color: "#7B8A99",
+    textAlign: "center",
   },
-  customHeader: {
-  backgroundColor: '#1E8449',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingHorizontal: 10,
-  paddingTop: 45,
-  paddingBottom: 12,
-},
-
-navButton: {
-  paddingVertical: 8,
-  paddingHorizontal: 12,
-  borderRadius: 20,
-  minWidth: 90,
-  alignItems: 'center',
-},
-
-backBtn: {
-  backgroundColor: '#145A32',
-},
-
-centerBtn: {
-  backgroundColor: '#F1C40F', // Ethiopian yellow
-},
-
-homeBtn: {
-  backgroundColor: '#922B21',
-},
-
-navButtonText: {
-  color: '#FFF',
-  fontWeight: '600',
-  fontSize: 14,
-},
-
 });

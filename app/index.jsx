@@ -1,10 +1,10 @@
 import { Link } from "expo-router";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 //import { Animated, Pressable } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,41 +15,40 @@ export default function HomeScreen() {
   const [lang, setLang] = useState("en");
   const t = strings[lang];
 
-
   useEffect(() => {
-  const loadLanguage = async () => {
-    const savedLang = await AsyncStorage.getItem('lang');
-    if (savedLang) {
-      setLang(savedLang);
-    }
+    const loadLanguage = async () => {
+      const savedLang = await AsyncStorage.getItem("lang");
+      if (savedLang) {
+        setLang(savedLang);
+      }
+    };
+    loadLanguage();
+  }, []);
+
+  const toggleLang = async () => {
+    const newLang = lang === "en" ? "am" : "en";
+    setLang(newLang);
+    await AsyncStorage.setItem("lang", newLang);
   };
-  loadLanguage();
-}, []);
-
-const toggleLang = async () => {
-  const newLang = lang === 'en' ? 'am' : 'en';
-  setLang(newLang);
-  await AsyncStorage.setItem('lang', newLang);
-};
-
-
 
   return (
-
-
-    
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
         <View style={{ width: 60 }} />
 
-        <Text style={styles.title}>{t.homeTitle}</Text>
+        <View style={styles.titleRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>{t.homeTitle}</Text>
+            <Text style={styles.subtitle}>{t.homeSubtitle}</Text>
+          </View>
 
-        <TouchableOpacity onPress={toggleLang} style={styles.langToggle}>
-          <Text style={styles.langText}>
-            {lang === "en" ? "EN | አማ" : "አማ | EN"}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={toggleLang} style={styles.langToggle}>
+            <Text style={styles.langText}>
+              {lang === "en" ? "EN | አማ" : "አማ | EN"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Quick Actions - SIMPLIFIED */}
@@ -59,8 +58,9 @@ const toggleLang = async () => {
             <View style={[styles.accent, { backgroundColor: "#1E8449" }]} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>🚌 {t.browseBuses}</Text>
-
-              <Text style={styles.cardSubtext}>View all 112 bus routes</Text>
+              <Text style={styles.cardSubtext}>
+                {t.homeCardSubtextBusGuide}
+              </Text>
             </View>
           </TouchableOpacity>
         </Link>
@@ -70,7 +70,9 @@ const toggleLang = async () => {
             <View style={[styles.accent, { backgroundColor: "#F1C40F" }]} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>🔍 {t.searchByBusNumber}</Text>
-              <Text style={styles.cardSubtext}>Find a specific bus</Text>
+              <Text style={styles.cardSubtext}>
+                {t.homeCardSubtextSearchNumber}
+              </Text>
             </View>
           </TouchableOpacity>
         </Link>
@@ -80,27 +82,31 @@ const toggleLang = async () => {
             <View style={[styles.accent, { backgroundColor: "#C0392B" }]} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>🔍 {t.searchRoute}</Text>
-              <Text style={styles.cardSubtext}>Your frequent buses</Text>
+              <Text style={styles.cardSubtext}>
+                {t.homeCardSubtextSearchRoute}
+              </Text>
             </View>
           </TouchableOpacity>
         </Link>
 
         <Link href="/saved-routes" asChild>
           <TouchableOpacity style={styles.cardButton}>
-            <View style={[styles.accent, { backgroundColor: "#C0392B" }]} />
+            <View style={[styles.accent, { backgroundColor: "#5B2C6F" }]} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>⭐ {t.savedRoutes}</Text>
-              <Text style={styles.cardSubtext}>Your frequent buses</Text>
+              <Text style={styles.cardSubtext}>
+                {t.homeCardSubtextSavedRoutes}
+              </Text>
             </View>
           </TouchableOpacity>
         </Link>
 
         <Link href="/where-to-go" asChild>
           <TouchableOpacity style={styles.cardButton}>
-            <View style={[styles.accent, { backgroundColor: "#C0392B" }]} />
+            <View style={[styles.accent, { backgroundColor: "#196F3D" }]} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>📍 {t.whereTo}</Text>
-              <Text style={styles.cardSubtext}>where do you want to go?</Text>
+              <Text style={styles.cardSubtext}>{t.homeCardSubtextWhereTo}</Text>
             </View>
           </TouchableOpacity>
         </Link>
@@ -131,7 +137,6 @@ const toggleLang = async () => {
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>112</Text>
           <Text style={styles.statLabel}>{t.stats.routes}</Text>
-
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>100%</Text>
@@ -146,8 +151,7 @@ const toggleLang = async () => {
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>{t.footer.tagline}</Text>
-<Text style={styles.versionText}>{t.footer.version}</Text>
-
+        <Text style={styles.versionText}>{t.footer.version}</Text>
       </View>
     </ScrollView>
   );
@@ -166,6 +170,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFBEA",
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
   },
 
   /* Header */
