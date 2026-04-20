@@ -149,12 +149,7 @@ export default function BusListScreen() {
           >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-          <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{t.title}</Text>
-            <Text style={styles.headerSubtitle}>
-              {filteredBuses.length} {t.busesFound}
-            </Text>
-          </View>
+          <Text style={styles.headerTitle}>{t.title}</Text>
           <TouchableOpacity
             style={styles.homeButton}
             onPress={() => router.push("/")}

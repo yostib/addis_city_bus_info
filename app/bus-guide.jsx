@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
+  SafeAreaView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FadeInView } from '../components/AnimatedCard';
+import { AppColors } from '../constants/theme';
 import { strings } from '../src/i18n/strings';
-import { useEffect, useState } from 'react';
 
 
 export default function BusGuideScreen() {
@@ -36,20 +39,30 @@ useEffect(() => {
 
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.sideBtn}>
-          <Text style={styles.headerBtn}>← {t.back}</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>{t.title}</Text>
-
-        {/* spacer for center alignment */}
-        <View style={styles.sideBtn} />
-      </View>
+    <SafeAreaView style={styles.container}>
+      {/* Enhanced Header with Gradient */}
+      <LinearGradient
+        colors={AppColors.gradients.primary}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.customHeader}
+      >
+        <FadeInView delay={0}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t.title}</Text>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => router.push('/')}
+          >
+            <Ionicons name="home" size={24} color="white" />
+          </TouchableOpacity>
+        </FadeInView>
+      </LinearGradient>
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -87,7 +100,7 @@ useEffect(() => {
           }
         />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -106,31 +119,29 @@ function Section({ icon, title, text }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F4F7',
+    backgroundColor: AppColors.background,
   },
 
-  /* Header */
-  header: {
-    height: 100,
-    paddingTop: 45,
-    paddingHorizontal: 20,
-    backgroundColor: "#1E8449",
+  /* Enhanced Header */
+  customHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButton: {
+    padding: 8,
   },
   headerTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'white',
+    flex: 1,
     textAlign: 'center',
   },
-  headerBtn: {
-    color: '#FFFFFF',
-    fontSize: 15,
-  },
-  sideBtn: {
-    width: 80,
+  homeButton: {
+    padding: 8,
   },
 
   /* Content */
@@ -141,16 +152,11 @@ const styles = StyleSheet.create({
 
   /* Sections */
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.surface,
     padding: 18,
     borderRadius: 16,
     marginBottom: 18,
-
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 3,
+    ...AppColors.shadows.light,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -158,17 +164,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionIcon: {
-    fontSize: 20,
-    marginRight: 8,
+    fontSize: 28,
+    marginRight: 12,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1E3A5F',
+    color: AppColors.textPrimary,
   },
   sectionText: {
     fontSize: 14,
-    color: '#555',
+    color: AppColors.textSecondary,
     lineHeight: 22,
   },
 });
