@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -10,6 +12,12 @@ import {
     View,
 } from "react-native";
 
+import {
+    AnimatedCard,
+    FadeInView,
+    LoadingSpinner,
+} from "../components/AnimatedCard";
+import { AppColors } from "../constants/theme";
 import sampleBusData from "../src/data/busData";
 import { strings } from "../src/i18n/strings";
 
@@ -18,6 +26,7 @@ export default function BusListScreen() {
   const [buses] = useState(sampleBusData);
   const [savedRoutes, setSavedRoutes] = useState([]);
   const [lang, setLang] = useState("en");
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const t = strings[lang].busList;
@@ -34,21 +43,24 @@ export default function BusListScreen() {
 
   // Load saved routes and language on mount
   useEffect(() => {
-    AsyncStorage.getItem("lang").then((stored) => {
-      if (stored) setLang(stored);
-    });
-
-    const loadSavedRoutes = async () => {
+    const loadData = async () => {
       try {
-        const saved = await AsyncStorage.getItem("savedRoutes");
+        const [storedLang, saved] = await Promise.all([
+          AsyncStorage.getItem("lang"),
+          AsyncStorage.getItem("savedRoutes"),
+        ]);
+
+        if (storedLang) setLang(storedLang);
         if (saved) {
           setSavedRoutes(JSON.parse(saved));
         }
       } catch (e) {
-        console.log("Failed to load saved routes", e);
+        console.log("Failed to load data", e);
+      } finally {
+        setIsLoading(false);
       }
     };
-    loadSavedRoutes();
+    loadData();
   }, []);
 
   const toggleSavedRoute = async (busId) => {
@@ -112,63 +124,158 @@ export default function BusListScreen() {
     </TouchableOpacity>
   );
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <LoadingSpinner size={50} color={AppColors.primary} />
+        <Text style={styles.loadingText}>
+          {t.loading || "Loading buses..."}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Custom Header */}
-      <View style={styles.customHeader}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.backButtonText}>← {t.back}</Text>
-        </TouchableOpacity>
-        <Text style={styles.customHeaderTitle}>{t.title}</Text>
-        <TouchableOpacity
-          style={styles.homeButton}
-          onPress={() => router.push("/")}
-        >
-          <Text style={styles.homeButtonText}>{t.home}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t.searchPlaceholder}
-          placeholderTextColor="#95A5A6"
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-        {searchText.length > 0 && (
+      {/* Enhanced Header */}
+      <LinearGradient
+        colors={AppColors.gradients.primary}
+        style={styles.customHeader}
+      >
+        <FadeInView delay={0}>
           <TouchableOpacity
-            style={styles.clearButton}
-            onPress={() => setSearchText("")}
+            style={styles.backButton}
+            onPress={() => router.back()}
           >
-            <Text style={styles.clearButtonText}>✕</Text>
+            <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-        )}
-      </View>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.customHeaderTitle}>{t.title}</Text>
+            <Text style={styles.headerSubtitle}>
+              {filteredBuses.length} {t.busesFound}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => router.push("/")}
+          >
+            <Ionicons name="home" size={24} color="white" />
+          </TouchableOpacity>
+        </FadeInView>
+      </LinearGradient>
+
+      {/* Enhanced Search Bar */}
+      <FadeInView delay={200} style={styles.searchContainer}>
+        <AnimatedCard style={styles.searchCard} shadowLevel="medium">
+          <View style={styles.searchInputContainer}>
+            <Ionicons name="search" size={20} color={AppColors.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t.searchPlaceholder}
+              placeholderTextColor={AppColors.textLight}
+              value={searchText}
+              onChangeText={setSearchText}
+            />
+            {searchText.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchText("")}>
+                <Ionicons
+                  name="close-circle"
+                  size={20}
+                  color={AppColors.textSecondary}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        </AnimatedCard>
+      </FadeInView>
 
       {/* Results Count */}
-      <View style={styles.resultsContainer}>
+      <FadeInView delay={300} style={styles.resultsContainer}>
         <Text style={styles.resultsText}>
           {filteredBuses.length} of {buses.length} buses
         </Text>
         <Text style={styles.tapHint}>{t.tapHint}</Text>
-      </View>
+      </FadeInView>
 
       <FlatList
         data={filteredBuses}
-        renderItem={renderBusItem}
+        renderItem={({ item, index }) => (
+          <FadeInView delay={400 + index * 100} style={styles.busItemContainer}>
+            <AnimatedCard
+              style={styles.busCard}
+              onPress={() => router.push(`/bus-detail/${item.id}`)}
+              shadowLevel="light"
+            >
+              <View style={styles.busHeader}>
+                <LinearGradient
+                  colors={AppColors.gradients.primary}
+                  style={styles.busNumber}
+                >
+                  <Text style={styles.busNumberText}>{item.number}</Text>
+                </LinearGradient>
+
+                <View style={styles.busInfo}>
+                  <Text style={styles.busName}>{item.name}</Text>
+                  <Text style={styles.busRoute}>
+                    <Ionicons
+                      name="location"
+                      size={14}
+                      color={AppColors.textSecondary}
+                    />{" "}
+                    {item.start} → {item.end}
+                  </Text>
+                </View>
+
+                <AnimatedCard
+                  style={styles.starButton}
+                  onPress={() => toggleSavedRoute(item.id)}
+                  gradientColors={
+                    savedRoutes.includes(item.id)
+                      ? AppColors.gradients.accent
+                      : ["#F1F5F9", "#E2E8F0"]
+                  }
+                >
+                  <Ionicons
+                    name={
+                      savedRoutes.includes(item.id) ? "heart" : "heart-outline"
+                    }
+                    size={24}
+                    color={
+                      savedRoutes.includes(item.id)
+                        ? "white"
+                        : AppColors.textSecondary
+                    }
+                  />
+                </AnimatedCard>
+              </View>
+
+              <View style={styles.busDetails}>
+                <Text style={styles.detailText}>
+                  <Text style={styles.detailLabel}>{t.via}: </Text>
+                  {item.through}
+                </Text>
+
+                <View style={styles.busFooter}>
+                  <Text style={styles.fare}>{item.fare}</Text>
+                  <Text style={styles.distance}>{item.distance}</Text>
+                </View>
+              </View>
+            </AnimatedCard>
+          </FadeInView>
+        )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
+          <FadeInView delay={400} style={styles.emptyContainer}>
+            <Ionicons
+              name="bus-outline"
+              size={64}
+              color={AppColors.textLight}
+            />
             <Text style={styles.emptyText}>{t.emptyText}</Text>
             <Text style={styles.emptySubtext}>{t.emptySubtext}</Text>
-          </View>
+          </FadeInView>
         }
       />
     </View>
@@ -178,123 +285,115 @@ export default function BusListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: AppColors.background,
   },
-  // Custom Header
+
+  // Loading State
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: AppColors.background,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: AppColors.textSecondary,
+  },
+
+  // Enhanced Header
   customHeader: {
-    backgroundColor: "#1E8449", // ✅ Matching your green theme
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 15,
     paddingTop: 50,
-    paddingBottom: 15,
+    paddingBottom: 20,
   },
   backButton: {
     padding: 8,
+    borderRadius: 20,
   },
-  backButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "600",
+  headerTextContainer: {
+    flex: 1,
+    alignItems: "center",
   },
   customHeaderTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#FFF",
+    color: "white",
+    textAlign: "center",
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.8)",
+    textAlign: "center",
+    marginTop: 2,
   },
   homeButton: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+    padding: 8,
+    borderRadius: 20,
   },
-  homeButtonText: {
-    color: "#FFF",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  // Search
+
+  // Enhanced Search
   searchContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  searchCard: {
+    borderRadius: 25,
+  },
+  searchInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
-    backgroundColor: "#FFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ECF0F1",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
   searchInput: {
     flex: 1,
-    backgroundColor: "#F8F9F9",
-    padding: 12,
-    borderRadius: 8,
     fontSize: 16,
-    color: "#2C3E50",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
+    color: AppColors.textPrimary,
+    marginLeft: 12,
+    marginRight: 8,
   },
-  clearButton: {
-    marginLeft: 10,
-    backgroundColor: "#ECF0F1",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  clearButtonText: {
-    color: "#7F8C8D",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+
   // Results
   resultsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    backgroundColor: "#FFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ECF0F1",
+    paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   resultsText: {
     fontSize: 14,
-    color: "#7F8C8D",
+    color: AppColors.textSecondary,
+    fontWeight: "500",
   },
   tapHint: {
     fontSize: 12,
-    color: "#3498DB",
-    fontStyle: "italic",
+    color: AppColors.textLight,
+    marginTop: 2,
   },
-  list: {
-    padding: 15,
-    paddingTop: 0,
+
+  // Bus Items
+  busItemContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
   },
   busCard: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 16,
+    backgroundColor: AppColors.surface,
   },
   busHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    padding: 16,
   },
   busNumber: {
-    backgroundColor: "#C0392B", // ✅ Matching your red theme
-    width: 40,
-    height: 40,
-    borderRadius: 8,
+    width: 60,
+    height: 60,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 16,
   },
   busNumberText: {
     color: "white",
@@ -305,63 +404,78 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   busName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2C3E50",
-    marginBottom: 3,
+    fontSize: 18,
+    fontWeight: "bold",
+    color: AppColors.textPrimary,
+    marginBottom: 4,
   },
   busRoute: {
-    fontSize: 13,
-    color: "#7F8C8D",
+    fontSize: 14,
+    color: AppColors.textSecondary,
+    flexDirection: "row",
+    alignItems: "center",
   },
+  starButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+
+  // Bus Details
   busDetails: {
-    paddingLeft: 5,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   detailText: {
     fontSize: 14,
-    color: "#34495E",
+    color: AppColors.textSecondary,
     marginBottom: 8,
   },
   detailLabel: {
-    fontWeight: "bold",
-    color: "#2C3E50",
+    fontWeight: "600",
+    color: AppColors.textPrimary,
   },
   busFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#ECF0F1",
+    alignItems: "center",
   },
   fare: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#27AE60",
+    color: AppColors.primary,
   },
   distance: {
     fontSize: 14,
-    color: "#3498DB",
+    color: AppColors.textLight,
   },
+
+  // List
+  list: {
+    paddingBottom: 20,
+  },
+
+  // Empty State
   emptyContainer: {
     alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
+    paddingVertical: 60,
+    paddingHorizontal: 40,
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#95A5A6",
-    marginBottom: 10,
+    fontWeight: "bold",
+    color: AppColors.textPrimary,
+    textAlign: "center",
+    marginTop: 16,
+    marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: "#BDC3C7",
+    color: AppColors.textSecondary,
     textAlign: "center",
-  },
-  starButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
+    lineHeight: 20,
   },
 });

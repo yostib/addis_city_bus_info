@@ -1,31 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
-import { strings } from '../src/i18n/strings';
-
-import busData from '../src/data/busData';
-//import styles from '../styles/routeSearchStyles'; // or wherever your styles are
+import {
+    AnimatedCard,
+    FadeInView,
+    SlideInView,
+} from "../components/AnimatedCard";
+import { AppColors } from "../constants/theme";
+import busData from "../src/data/busData";
+import { strings } from "../src/i18n/strings";
 
 export default function RouteSearchScreen() {
   const router = useRouter();
 
-  const [lang, setLang] = useState('en');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [lang, setLang] = useState("en");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [results, setResults] = useState([]);
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
@@ -34,26 +40,22 @@ export default function RouteSearchScreen() {
 
   // 🔤 Load language
   useEffect(() => {
-    AsyncStorage.getItem('lang').then(stored => {
+    AsyncStorage.getItem("lang").then((stored) => {
       if (stored) setLang(stored);
     });
   }, []);
 
   const t = strings[lang].routeSearch;
 
-  const allStops = Array.from(
-    new Set(busData.flatMap(bus => bus.route))
-  );
+  const allStops = Array.from(new Set(busData.flatMap((bus) => bus.route)));
 
   const getValidDestinations = (fromStop) => {
     const destinations = new Set();
 
-    busData.forEach(bus => {
+    busData.forEach((bus) => {
       const idx = bus.route.indexOf(fromStop);
       if (idx !== -1) {
-        bus.route.slice(idx + 1).forEach(stop =>
-          destinations.add(stop)
-        );
+        bus.route.slice(idx + 1).forEach((stop) => destinations.add(stop));
       }
     });
 
@@ -66,8 +68,8 @@ export default function RouteSearchScreen() {
       return;
     }
 
-    const matches = busData.filter(bus => {
-      const route = bus.route.map(s => s.toLowerCase());
+    const matches = busData.filter((bus) => {
+      const route = bus.route.map((s) => s.toLowerCase());
       const f = route.indexOf(from.toLowerCase());
       const t = route.indexOf(to.toLowerCase());
       return f !== -1 && t !== -1 && f < t;
@@ -77,174 +79,271 @@ export default function RouteSearchScreen() {
   };
 
   useEffect(() => {
-    AsyncStorage.getItem('savedRoutes').then(saved => {
+    AsyncStorage.getItem("savedRoutes").then((saved) => {
       if (saved) setSavedRoutes(JSON.parse(saved));
     });
   }, []);
 
-  const isSaved = id => savedRoutes.includes(id);
+  const isSaved = (id) => savedRoutes.includes(id);
 
-  const toggleSave = async id => {
+  const toggleSave = async (id) => {
     const updated = isSaved(id)
-      ? savedRoutes.filter(r => r !== id)
+      ? savedRoutes.filter((r) => r !== id)
       : [...savedRoutes, id];
 
     setSavedRoutes(updated);
-    await AsyncStorage.setItem('savedRoutes', JSON.stringify(updated));
+    await AsyncStorage.setItem("savedRoutes", JSON.stringify(updated));
   };
 
   return (
     <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 40 }}
         >
-          {/* Header */}
-          <View style={styles.customHeader}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.backText}>← {t.back}</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.headerTitle}>{t.title}</Text>
-
-            <View style={{ width: 50 }} />
-          </View>
+          {/* Enhanced Header */}
+          <LinearGradient
+            colors={AppColors.gradients.primary}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.customHeader}
+          >
+            <FadeInView delay={0}>
+              <TouchableOpacity onPress={() => router.back()}>
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>{t.title}</Text>
+              <TouchableOpacity onPress={() => router.push("/")}>
+                <Ionicons name="home" size={24} color="white" />
+              </TouchableOpacity>
+            </FadeInView>
+          </LinearGradient>
 
           <View style={styles.form}>
             {/* FROM */}
-            <Text style={styles.label}>{t.from}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t.fromPlaceholder}
-              value={from}
-              onChangeText={text => {
-                setFrom(text);
-                setValidatedFrom(null);
-                setTo('');
-                setResults([]);
+            <FadeInView delay={200}>
+              <Text style={styles.label}>{t.from}</Text>
+              <AnimatedCard style={styles.inputCard} shadowLevel="medium">
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="location"
+                    size={20}
+                    color={AppColors.textSecondary}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t.fromPlaceholder}
+                    placeholderTextColor={AppColors.textLight}
+                    value={from}
+                    onChangeText={(text) => {
+                      setFrom(text);
+                      setValidatedFrom(null);
+                      setTo("");
+                      setResults([]);
 
-                if (!text) {
-                  setFromSuggestions([]);
-                  return;
-                }
+                      if (!text) {
+                        setFromSuggestions([]);
+                        return;
+                      }
 
-                setFromSuggestions(
-                  allStops
-                    .filter(s =>
-                      s.toLowerCase().includes(text.toLowerCase())
-                    )
-                    .slice(0, 6)
-                );
-              }}
-            />
+                      setFromSuggestions(
+                        allStops
+                          .filter((s) =>
+                            s.toLowerCase().includes(text.toLowerCase()),
+                          )
+                          .slice(0, 6),
+                      );
+                    }}
+                  />
+                  {from.length > 0 && (
+                    <TouchableOpacity onPress={() => setFrom("")}>
+                      <Ionicons
+                        name="close-circle"
+                        size={20}
+                        color={AppColors.textSecondary}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </AnimatedCard>
 
-            {fromSuggestions.map((item, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={styles.suggestionItem}
-                onPress={() => {
-                  setFrom(item);
-                  setValidatedFrom(item);
-                  setFromSuggestions([]);
-                  setTo('');
-                  setToSuggestions([]);
-                  setResults([]);
-                }}
-              >
-                <Text style={styles.suggestionText}>{item}</Text>
-              </TouchableOpacity>
-            ))}
+              {fromSuggestions.map((item, idx) => (
+                <SlideInView key={idx} direction="down" delay={250 + idx * 30}>
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => {
+                      setFrom(item);
+                      setValidatedFrom(item);
+                      setFromSuggestions([]);
+                      setTo("");
+                      setToSuggestions([]);
+                      setResults([]);
+                    }}
+                  >
+                    <Ionicons name="pin" size={16} color={AppColors.primary} />
+                    <Text style={styles.suggestionText}>{item}</Text>
+                  </TouchableOpacity>
+                </SlideInView>
+              ))}
+            </FadeInView>
 
             {/* TO */}
-            <Text style={styles.label}>{t.to}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t.toPlaceholder}
-              value={to}
-              onChangeText={text => {
-                setTo(text);
-                setResults([]);
+            <FadeInView delay={300}>
+              <Text style={styles.label}>{t.to}</Text>
+              <AnimatedCard style={styles.inputCard} shadowLevel="medium">
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="location"
+                    size={20}
+                    color={AppColors.textSecondary}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t.toPlaceholder}
+                    placeholderTextColor={AppColors.textLight}
+                    value={to}
+                    editable={!!validatedFrom}
+                    onChangeText={(text) => {
+                      setTo(text);
+                      setResults([]);
 
-                if (!validatedFrom || !text) {
-                  setToSuggestions([]);
-                  return;
-                }
+                      if (!validatedFrom || !text) {
+                        setToSuggestions([]);
+                        return;
+                      }
 
-                setToSuggestions(
-                  getValidDestinations(validatedFrom)
-                    .filter(s =>
-                      s.toLowerCase().includes(text.toLowerCase())
-                    )
-                    .slice(0, 6)
-                );
-              }}
-            />
+                      setToSuggestions(
+                        getValidDestinations(validatedFrom)
+                          .filter((s) =>
+                            s.toLowerCase().includes(text.toLowerCase()),
+                          )
+                          .slice(0, 6),
+                      );
+                    }}
+                  />
+                  {to.length > 0 && (
+                    <TouchableOpacity onPress={() => setTo("")}>
+                      <Ionicons
+                        name="close-circle"
+                        size={20}
+                        color={AppColors.textSecondary}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </AnimatedCard>
 
-            {toSuggestions.map((item, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={styles.suggestionItem}
+              {toSuggestions.map((item, idx) => (
+                <SlideInView key={idx} direction="down" delay={350 + idx * 30}>
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => {
+                      setTo(item);
+                      setToSuggestions([]);
+                    }}
+                  >
+                    <Ionicons name="pin" size={16} color={AppColors.accent} />
+                    <Text style={styles.suggestionText}>{item}</Text>
+                  </TouchableOpacity>
+                </SlideInView>
+              ))}
+            </FadeInView>
+
+            {/* Search Button */}
+            <SlideInView
+              delay={400}
+              direction="up"
+              style={styles.buttonContainer}
+            >
+              <AnimatedCard
+                style={styles.searchButton}
+                gradientColors={AppColors.gradients.primary}
                 onPress={() => {
-                  setTo(item);
-                  setToSuggestions([]);
+                  Keyboard.dismiss();
+                  searchRoutes();
                 }}
               >
-                <Text style={styles.suggestionText}>{item}</Text>
-              </TouchableOpacity>
-            ))}
+                <Ionicons
+                  name="search"
+                  size={20}
+                  color="white"
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={styles.searchText}>{t.search}</Text>
+              </AnimatedCard>
+            </SlideInView>
 
-            <TouchableOpacity
-              style={styles.searchButton}
-              onPress={() => {
-                Keyboard.dismiss();
-                searchRoutes();
-              }}
-            >
-              <Text style={styles.searchText}>{t.search}</Text>
-            </TouchableOpacity>
+            {/* Results */}
+            <FadeInView delay={500} style={styles.resultsContainer}>
+              {results.length > 0 && (
+                <Text style={styles.resultsTitle}>
+                  {results.length} {t.routesFound}
+                </Text>
+              )}
 
-            {results.map(bus => (
-              <TouchableOpacity
-                key={bus.id}
-                style={styles.busCard}
-                onPress={() =>
-                  router.push(`/bus-detail/${bus.id}`)
-                }
-              >
-                <View style={styles.busHeader}>
-                  <View style={styles.busNumber}>
-                    <Text style={styles.busNumberText}>
-                      {bus.number}
-                    </Text>
-                  </View>
-
-                  <View style={styles.busInfo}>
-                    <Text style={styles.busName}>{bus.name}</Text>
-                    <Text style={styles.busRoute}>
-                      {bus.start} → {bus.end}
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    onPress={() => toggleSave(bus.id)}
+              {results.map((bus, index) => (
+                <SlideInView
+                  key={bus.id}
+                  direction={index % 2 === 0 ? "left" : "right"}
+                  delay={600 + index * 100}
+                >
+                  <AnimatedCard
+                    style={styles.busCard}
+                    onPress={() => router.push(`/bus-detail/${bus.id}`)}
+                    shadowLevel="light"
                   >
-                    <Text style={{ fontSize: 22 }}>
-                      {isSaved(bus.id) ? '⭐' : '☆'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
+                    <LinearGradient
+                      colors={AppColors.gradients.primary}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.busCardGradient}
+                    >
+                      <View style={styles.busNumber}>
+                        <Text style={styles.busNumberText}>{bus.number}</Text>
+                      </View>
 
-            {results.length === 0 && from && to && (
-              <Text style={styles.noResult}>
-                {t.noResults}
-              </Text>
-            )}
+                      <View style={styles.busInfo}>
+                        <Text style={styles.busName}>{bus.name}</Text>
+                        <View style={styles.routeRow}>
+                          <Ionicons
+                            name="location"
+                            size={14}
+                            color="rgba(255,255,255,0.8)"
+                          />
+                          <Text style={styles.busRoute}>
+                            {" "}
+                            {bus.start} → {bus.end}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <TouchableOpacity onPress={() => toggleSave(bus.id)}>
+                        <Ionicons
+                          name={isSaved(bus.id) ? "heart" : "heart-outline"}
+                          size={24}
+                          color={isSaved(bus.id) ? "#FDC947" : "white"}
+                        />
+                      </TouchableOpacity>
+                    </LinearGradient>
+                  </AnimatedCard>
+                </SlideInView>
+              ))}
+
+              {results.length === 0 && from && to && (
+                <FadeInView delay={600} style={styles.noResultContainer}>
+                  <Ionicons
+                    name="bus-outline"
+                    size={64}
+                    color={AppColors.textLight}
+                  />
+                  <Text style={styles.noResult}>{t.noResults}</Text>
+                </FadeInView>
+              )}
+            </FadeInView>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -255,130 +354,155 @@ export default function RouteSearchScreen() {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  scrollContent: {
-    paddingBottom: 40,
+    backgroundColor: AppColors.background,
   },
   customHeader: {
-    backgroundColor: '#1E8449',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: AppColors.textLight,
+    ...AppColors.shadows.medium,
   },
-
-  
   backText: {
-    color: 'white',
-    fontWeight: '600',
+    fontSize: 16,
+    color: "white",
+    fontWeight: "600",
   },
   headerTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+    flex: 1,
   },
   form: {
     padding: 16,
+    paddingTop: 12,
   },
   label: {
-    marginTop: 16,
-    marginBottom: 6,
-    fontWeight: '500',
-    color: '#334155',
+    fontSize: 14,
+    fontWeight: "600",
+    color: AppColors.textPrimary,
+    marginBottom: 8,
+    marginTop: 12,
+  },
+  inputCard: {
+    marginBottom: 8,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   input: {
-    backgroundColor: '#E5E7EB',
-    padding: 12,
-    borderRadius: 10,
+    flex: 1,
+    fontSize: 16,
+    color: AppColors.textPrimary,
+    borderRadius: 8,
+    backgroundColor: "transparent",
   },
   suggestionItem: {
-    backgroundColor: '#FFFFFF',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 4,
+    backgroundColor: AppColors.surfaceSecondary,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: AppColors.primary,
+    gap: 10,
   },
   suggestionText: {
-    color: '#1F2937',
+    fontSize: 14,
+    color: AppColors.textPrimary,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
   },
   searchButton: {
-    backgroundColor: '#22C55E',
-    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
     borderRadius: 12,
-    marginTop: 24,
-    alignItems: 'center',
+    ...AppColors.shadows.medium,
   },
   searchText: {
-    fontWeight: 'bold',
-    color: '#052E16',
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
-  resultItem: {
-    backgroundColor: '#FFFFFF',
-    padding: 14,
-    borderRadius: 12,
-    marginTop: 10,
+  resultsContainer: {
+    gap: 12,
   },
-  resultTitle: {
-    fontWeight: 'bold',
-  },
-  resultSubtitle: {
-    marginTop: 4,
-    color: '#475569',
-  },
-  noResult: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#64748B',
+  resultsTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: AppColors.textSecondary,
+    marginBottom: 8,
   },
   busCard: {
-  backgroundColor: 'white',
-  borderRadius: 12,
-  padding: 14,
-  marginBottom: 12,
-  elevation: 3,
-},
-
-busHeader: {
-  flexDirection: 'row',
-  alignItems: 'center',
-},
-
-
-busNumber: {
-  backgroundColor: '#E74C3C',
-  width: 48,
-  height: 48,
-  borderRadius: 12,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginRight: 14,
-},
-
-busNumberText: {
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: 18,
-},
-
-busInfo: {
-  flex: 1,
-},
-
-busName: {
-  fontSize: 16,
-  fontWeight: 'bold',
-  color: '#1F2937',
-},
-
-busRoute: {
-  color: '#64748B',
-  marginTop: 4,
-},
-starButton: {
-  marginLeft: 10,
-  padding: 6,
-},
-
-starText: {
-  fontSize: 20,
-},
+    borderRadius: 12,
+    overflow: "hidden",
+    ...AppColors.shadows.light,
+  },
+  busCardGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  busNumber: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.5)",
+  },
+  busNumberText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  busInfo: {
+    flex: 1,
+    gap: 4,
+  },
+  busName: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "white",
+  },
+  routeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  busRoute: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.9)",
+  },
+  noResultContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
+    gap: 12,
+  },
+  noResult: {
+    fontSize: 16,
+    color: AppColors.textSecondary,
+    textAlign: "center",
+    marginTop: 8,
+  },
 });

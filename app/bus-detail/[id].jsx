@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -9,6 +11,12 @@ import {
     View,
 } from "react-native";
 
+import {
+    AnimatedCard,
+    FadeInView,
+    SlideInView,
+} from "../../components/AnimatedCard";
+import { AppColors } from "../../constants/theme";
 import busData from "../../src/data/busData";
 import { strings } from "../../src/i18n/strings";
 
@@ -59,115 +67,215 @@ export default function BusDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.customHeader}>
-        <TouchableOpacity
-          style={[styles.navButton, styles.backBtn]}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.navButtonText}>← {t.back}</Text>
-        </TouchableOpacity>
-
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>{bus.number}</Text>
-          <Text style={styles.headerSubtitle}>{bus.name}</Text>
-        </View>
-
-        <TouchableOpacity
-          style={[styles.navButton, styles.homeBtn]}
-          onPress={() => router.push("/")}
-        >
-          <Text style={styles.navButtonText}>{t.home}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        onPress={toggleSaveRoute}
-        style={[
-          styles.actionButton,
-          savedRoutes.includes(bus.id)
-            ? styles.removeButton
-            : styles.saveButton,
-        ]}
+      {/* Enhanced Header with Gradient */}
+      <LinearGradient
+        colors={AppColors.gradients.primary}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.customHeader}
       >
-        <Text style={styles.actionButtonText}>
-          {savedRoutes.includes(bus.id) ? t.removeSaved : t.saveRoute}
-        </Text>
-      </TouchableOpacity>
+        <FadeInView delay={0}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>{bus.number}</Text>
+            <Text style={styles.headerSubtitle}>{bus.name}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => router.push("/")}
+          >
+            <Ionicons name="home" size={24} color="white" />
+          </TouchableOpacity>
+        </FadeInView>
+      </LinearGradient>
 
-      <View style={styles.headerCard}>
-        <View style={styles.busNumberLarge}>
-          <Text style={styles.busNumberText}>{bus.number}</Text>
-        </View>
-        <View style={styles.routeInfo}>
-          <Text style={styles.routeName}>{bus.name}</Text>
-          <Text style={styles.routeSubtitle}>
-            {bus.start} → {bus.end}
+      {/* Save/Remove Button */}
+      <FadeInView delay={200} style={styles.actionButtonContainer}>
+        <AnimatedCard
+          style={[
+            styles.actionButton,
+            savedRoutes.includes(bus.id)
+              ? styles.removeButton
+              : styles.saveButton,
+          ]}
+          onPress={toggleSaveRoute}
+          gradientColors={
+            savedRoutes.includes(bus.id)
+              ? AppColors.gradients.secondary
+              : AppColors.gradients.primary
+          }
+        >
+          <Ionicons
+            name={savedRoutes.includes(bus.id) ? "heart" : "heart-outline"}
+            size={20}
+            color="white"
+            style={{ marginRight: 8 }}
+          />
+          <Text style={styles.actionButtonText}>
+            {savedRoutes.includes(bus.id) ? t.removeSaved : t.saveRoute}
           </Text>
-        </View>
-      </View>
+        </AnimatedCard>
+      </FadeInView>
 
-      <View style={styles.section}>
+      {/* Main Bus Card */}
+      <SlideInView
+        delay={300}
+        direction="up"
+        style={styles.headerCardContainer}
+      >
+        <AnimatedCard style={styles.headerCard} shadowLevel="medium">
+          <LinearGradient
+            colors={AppColors.gradients.primary}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.headerCardGradient}
+          >
+            <View style={styles.busNumberLarge}>
+              <Text style={styles.busNumberText}>{bus.number}</Text>
+            </View>
+            <View style={styles.routeInfo}>
+              <Text style={styles.routeName}>{bus.name}</Text>
+              <Text style={styles.routeSubtitle}>
+                {bus.start} → {bus.end}
+              </Text>
+            </View>
+          </LinearGradient>
+        </AnimatedCard>
+      </SlideInView>
+
+      {/* Route Details Section */}
+      <FadeInView delay={400} style={styles.section}>
         <Text style={styles.sectionTitle}>{t.routeDetails}</Text>
-        <View style={styles.routeStep}>
-          <View style={[styles.stepIcon, styles.startIcon]}>
-            <Text style={styles.stepText}>S</Text>
-          </View>
-          <View style={styles.stepInfo}>
-            <Text style={styles.stepTitle}>{t.startingPoint}</Text>
-            <Text style={styles.stepLocation}>{bus.start}</Text>
-          </View>
-        </View>
 
-        <View style={styles.routeStep}>
-          <View style={[styles.stepIcon, styles.viaIcon]}>
-            <Text style={styles.stepText}>V</Text>
-          </View>
-          <View style={styles.stepInfo}>
-            <Text style={styles.stepTitle}>{t.via}</Text>
-            <Text style={styles.stepLocation}>{bus.through}</Text>
-          </View>
-        </View>
+        <SlideInView
+          direction="right"
+          delay={450}
+          style={styles.routeStepContainer}
+        >
+          <AnimatedCard style={styles.routeStep} shadowLevel="light">
+            <View style={[styles.stepIcon, styles.startIcon]}>
+              <Ionicons name="play-circle" size={20} color="white" />
+            </View>
+            <View style={styles.stepInfo}>
+              <Text style={styles.stepTitle}>{t.startingPoint}</Text>
+              <Text style={styles.stepLocation}>{bus.start}</Text>
+            </View>
+          </AnimatedCard>
+        </SlideInView>
 
-        <View style={styles.routeStep}>
-          <View style={[styles.stepIcon, styles.endIcon]}>
-            <Text style={styles.stepText}>E</Text>
-          </View>
-          <View style={styles.stepInfo}>
-            <Text style={styles.stepTitle}>{t.destination}</Text>
-            <Text style={styles.stepLocation}>{bus.end}</Text>
-          </View>
-        </View>
-      </View>
+        <SlideInView
+          direction="left"
+          delay={500}
+          style={styles.routeStepContainer}
+        >
+          <AnimatedCard style={styles.routeStep} shadowLevel="light">
+            <View style={[styles.stepIcon, styles.viaIcon]}>
+              <Ionicons name="pin" size={20} color="white" />
+            </View>
+            <View style={styles.stepInfo}>
+              <Text style={styles.stepTitle}>{t.via}</Text>
+              <Text style={styles.stepLocation}>{bus.through}</Text>
+            </View>
+          </AnimatedCard>
+        </SlideInView>
 
-      <View style={styles.section}>
+        <SlideInView
+          direction="right"
+          delay={550}
+          style={styles.routeStepContainer}
+        >
+          <AnimatedCard style={styles.routeStep} shadowLevel="light">
+            <View style={[styles.stepIcon, styles.endIcon]}>
+              <Ionicons name="stop-circle" size={20} color="white" />
+            </View>
+            <View style={styles.stepInfo}>
+              <Text style={styles.stepTitle}>{t.destination}</Text>
+              <Text style={styles.stepLocation}>{bus.end}</Text>
+            </View>
+          </AnimatedCard>
+        </SlideInView>
+      </FadeInView>
+
+      {/* Trip Info Section */}
+      <FadeInView delay={600} style={styles.section}>
         <Text style={styles.sectionTitle}>{t.tripInfo}</Text>
-        <View style={styles.infoRow}>
-          <View style={styles.infoBox}>
-            <Text style={styles.infoLabel}>{t.fare}</Text>
-            <Text style={styles.infoValue}>{bus.fare}</Text>
-          </View>
-          <View style={styles.infoBox}>
-            <Text style={styles.infoLabel}>{t.distance}</Text>
-            <Text style={styles.infoValue}>{bus.distance}</Text>
-          </View>
-        </View>
-      </View>
+        <View style={styles.infoRowContainer}>
+          <SlideInView
+            direction="left"
+            delay={650}
+            style={styles.infoBoxContainer}
+          >
+            <AnimatedCard style={styles.infoBox} shadowLevel="light">
+              <LinearGradient
+                colors={AppColors.gradients.accent}
+                style={styles.infoBoxGradient}
+              >
+                <Text style={styles.infoLabel}>{t.fare}</Text>
+                <Text style={styles.infoValue}>{bus.fare}</Text>
+              </LinearGradient>
+            </AnimatedCard>
+          </SlideInView>
 
-      <View style={styles.section}>
+          <SlideInView
+            direction="right"
+            delay={700}
+            style={styles.infoBoxContainer}
+          >
+            <AnimatedCard style={styles.infoBox} shadowLevel="light">
+              <LinearGradient
+                colors={AppColors.gradients.secondary}
+                style={styles.infoBoxGradient}
+              >
+                <Text style={styles.infoLabel}>{t.distance}</Text>
+                <Text style={styles.infoValue}>{bus.distance}</Text>
+              </LinearGradient>
+            </AnimatedCard>
+          </SlideInView>
+        </View>
+      </FadeInView>
+
+      {/* Full Route Stops */}
+      <FadeInView delay={750} style={styles.section}>
         <Text style={styles.sectionTitle}>{t.fullRouteStops}</Text>
         {bus.route.map((stop, index) => (
-          <View key={index} style={styles.stopItem}>
-            <View style={styles.stopNumber}>
-              <Text style={styles.stopNumberText}>{index + 1}</Text>
-            </View>
-            <Text style={styles.stopName}>{stop}</Text>
-          </View>
+          <SlideInView
+            key={index}
+            direction={index % 2 === 0 ? "left" : "right"}
+            delay={800 + index * 50}
+            style={styles.stopItemContainer}
+          >
+            <AnimatedCard style={styles.stopItem} shadowLevel="light">
+              <View style={styles.stopNumber}>
+                <Text style={styles.stopNumberText}>{index + 1}</Text>
+              </View>
+              <Text style={styles.stopName}>{stop}</Text>
+            </AnimatedCard>
+          </SlideInView>
         ))}
-      </View>
+      </FadeInView>
 
-      <View style={styles.noteBox}>
-        <Text style={styles.noteText}>{t.offlineNote}</Text>
-      </View>
+      {/* Note Box */}
+      <FadeInView delay={900} style={styles.section}>
+        <AnimatedCard style={styles.noteBox} shadowLevel="medium">
+          <LinearGradient
+            colors={AppColors.gradients.primary}
+            style={styles.noteBoxGradient}
+          >
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color="white"
+              style={{ marginRight: 12 }}
+            />
+            <Text style={styles.noteText}>{t.offlineNote}</Text>
+          </LinearGradient>
+        </AnimatedCard>
+      </FadeInView>
     </ScrollView>
   );
 }
@@ -175,233 +283,263 @@ export default function BusDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F6F8",
+    backgroundColor: AppColors.background,
   },
+
+  /* Enhanced Header */
   customHeader: {
-    backgroundColor: "#1E8449",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: 44,
-    paddingBottom: 14,
+    paddingBottom: 20,
+  },
+  backButton: {
+    padding: 8,
+  },
+  homeButton: {
+    padding: 8,
   },
   headerCenter: {
     flex: 1,
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   headerSubtitle: {
-    color: "#D5E8D4",
-    fontSize: 12,
+    color: "rgba(255,255,255,0.9)",
+    fontSize: 13,
+    marginTop: 2,
   },
-  navButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    minWidth: 80,
-    alignItems: "center",
-  },
-  backBtn: {
-    backgroundColor: "#145A32",
-  },
-  homeBtn: {
-    backgroundColor: "#196F3D",
-  },
-  navButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: 14,
+
+  /* Action Button Container */
+  actionButtonContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
   },
   actionButton: {
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 8,
-    padding: 14,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  saveButton: {
-    backgroundColor: "#1E8449",
-  },
-  removeButton: {
-    backgroundColor: "#C0392B",
-  },
-  actionButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 15,
-  },
-  headerCard: {
-    backgroundColor: "#1E8449",
-    margin: 16,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 16,
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    elevation: 5,
+    justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  saveButton: {},
+  removeButton: {},
+  actionButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  /* Main Bus Card */
+  headerCardContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  headerCard: {
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  headerCardGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
   },
   busNumberLarge: {
-    backgroundColor: "#E74C3C",
     width: 70,
     height: 70,
-    borderRadius: 18,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 18,
+    marginRight: 16,
   },
   busNumberText: {
-    color: "white",
     fontSize: 28,
     fontWeight: "bold",
+    color: "white",
   },
   routeInfo: {
     flex: 1,
   },
   routeName: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    fontWeight: "bold",
+    color: "white",
     marginBottom: 4,
   },
   routeSubtitle: {
-    fontSize: 13,
-    color: "#D5E8D4",
+    fontSize: 14,
+    color: "rgba(255,255,255,0.9)",
   },
+
+  /* Sections */
   section: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
-    marginVertical: 10,
-    padding: 20,
-    borderRadius: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#1E3748",
+    fontWeight: "bold",
+    color: AppColors.textPrimary,
     marginBottom: 16,
+  },
+
+  /* Route Steps */
+  routeStepContainer: {
+    marginBottom: 12,
   },
   routeStep: {
+    borderRadius: 16,
+    backgroundColor: AppColors.surface,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    padding: 16,
   },
   stepIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 50,
+    height: 50,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
   },
   startIcon: {
-    backgroundColor: "#27AE60",
+    backgroundColor: AppColors.primary,
   },
   viaIcon: {
-    backgroundColor: "#3498DB",
+    backgroundColor: AppColors.accent,
   },
   endIcon: {
-    backgroundColor: "#E74C3C",
+    backgroundColor: AppColors.secondary,
   },
   stepText: {
     color: "white",
-    fontWeight: "700",
-    fontSize: 16,
+    fontWeight: "bold",
+    fontSize: 18,
   },
   stepInfo: {
     flex: 1,
   },
   stepTitle: {
     fontSize: 12,
-    color: "#7B8A99",
+    fontWeight: "600",
+    color: AppColors.textSecondary,
     marginBottom: 4,
   },
   stepLocation: {
-    fontSize: 16,
-    color: "#243447",
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "bold",
+    color: AppColors.textPrimary,
   },
-  infoRow: {
+
+  /* Info Row */
+  infoRowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 12,
+  },
+  infoBoxContainer: {
+    flex: 1,
   },
   infoBox: {
-    flex: 1,
-    alignItems: "center",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  infoBoxGradient: {
     padding: 16,
-    borderRadius: 14,
-    backgroundColor: "#F4F7FB",
-    marginHorizontal: 5,
+    alignItems: "center",
   },
   infoLabel: {
-    color: "#7B8A99",
+    fontSize: 12,
+    color: "white",
+    opacity: 0.9,
     marginBottom: 8,
-    fontSize: 13,
   },
   infoValue: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1D3557",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+  },
+
+  /* Stop Items */
+  stopItemContainer: {
+    marginBottom: 10,
   },
   stopItem: {
+    borderRadius: 16,
+    backgroundColor: AppColors.surface,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E9EEF3",
+    padding: 16,
+  },
+  stopItemContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
   },
   stopNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#DDE3EA",
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: AppColors.primary,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
+    marginRight: 12,
   },
   stopNumberText: {
-    color: "#2C3E50",
-    fontWeight: "700",
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 14,
   },
   stopName: {
     fontSize: 15,
-    color: "#2C3E50",
+    fontWeight: "500",
+    color: AppColors.textPrimary,
+    flex: 1,
   },
+
+  /* Note Box */
   noteBox: {
-    backgroundColor: "#E8F5FE",
-    marginHorizontal: 16,
-    marginTop: 10,
+    marginHorizontal: 20,
+    marginVertical: 20,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  noteBoxGradient: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
-    borderRadius: 14,
   },
   noteText: {
-    color: "#1D4F91",
-    lineHeight: 22,
-    textAlign: "center",
+    fontSize: 14,
+    color: "white",
+    flex: 1,
+    fontWeight: "500",
   },
+
+  /* Error State */
   errorText: {
-    fontSize: 20,
-    color: "#E74C3C",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: AppColors.error,
     textAlign: "center",
-    marginTop: 50,
-    fontWeight: "700",
+    marginTop: 40,
   },
   errorSubtext: {
-    marginTop: 10,
-    color: "#7B8A99",
+    fontSize: 14,
+    color: AppColors.textSecondary,
     textAlign: "center",
+    marginTop: 8,
   },
 });
