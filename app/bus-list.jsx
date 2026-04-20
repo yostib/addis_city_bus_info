@@ -150,7 +150,7 @@ export default function BusListScreen() {
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.customHeaderTitle}>{t.title}</Text>
+            <Text style={styles.headerTitle}>{t.title}</Text>
             <Text style={styles.headerSubtitle}>
               {filteredBuses.length} {t.busesFound}
             </Text>
@@ -306,33 +306,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   backButton: {
     padding: 8,
-    borderRadius: 20,
   },
-  headerTextContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  customHeaderTitle: {
-    fontSize: 20,
+  headerTitle: {
+    fontSize: 22,
     fontWeight: "bold",
     color: "white",
+    flex: 1,
     textAlign: "center",
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.8)",
-    textAlign: "center",
-    marginTop: 2,
   },
   homeButton: {
     padding: 8,
-    borderRadius: 20,
   },
 
   // Enhanced Search

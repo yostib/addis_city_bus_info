@@ -6,10 +6,15 @@ import {
   FlatList, 
   TouchableOpacity,
   Platform,
-  ActivityIndicator  // ← ADDED for loading state
+  ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { AnimatedCard, FadeInView, SlideInView } from '../components/AnimatedCard';
+import { AppColors } from '../constants/theme';
 import busData from '../src/data/busData';
 import { strings } from '../src/i18n/strings';
 
@@ -57,186 +62,181 @@ export default function SavedRoutesScreen() {
   };
 
   // Render each saved bus item
-  const renderBusItem = ({ item }) => {
+  const renderBusItem = ({ item, index }) => {
     const bus = busData.find(b => b.id === item);
     if (!bus) return null;
 
     return (
-      <View style={styles.busCard}>
-        {/* Tap area → go to details */}
-        <TouchableOpacity
-          style={styles.busMain}
+      <SlideInView
+        key={bus.id}
+        direction={index % 2 === 0 ? 'left' : 'right'}
+        delay={200 + index * 100}
+        style={styles.busItemContainer}
+      >
+        <AnimatedCard
+          style={styles.busCard}
           onPress={() => router.push(`/bus-detail/${bus.id}`)}
+          shadowLevel="light"
         >
-          <View style={styles.busHeader}>
+          <LinearGradient
+            colors={AppColors.gradients.primary}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.busCardGradient}
+          >
             <View style={styles.busNumber}>
               <Text style={styles.busNumberText}>{bus.number}</Text>
             </View>
             <View style={styles.busInfo}>
               <Text style={styles.busName}>{bus.name}</Text>
-              <Text style={styles.busRoute}>
-                {bus.start} → {bus.end}
-              </Text>
+              <View style={styles.routeRow}>
+                <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
+                <Text style={styles.busRoute}> {bus.start} → {bus.end}</Text>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-
-        {/* Remove button - using translation */}
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={() => removeSavedRoute(bus.id)}
-        >
-          <Text style={styles.removeText}>{t.remove || 'Remove'}</Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity
+              onPress={(e) => {
+                e.stopPropagation();
+                removeSavedRoute(bus.id);
+              }}
+            >
+              <Ionicons name="close-circle" size={24} color="white" />
+            </TouchableOpacity>
+          </LinearGradient>
+        </AnimatedCard>
+      </SlideInView>
     );
   };
 
   // Show loading indicator
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1E8449" />
-      </View>
+      <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={AppColors.primary} />
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Custom Header */}
-      <View style={styles.customHeader}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.backButtonText}>← {t.back || 'Back'}</Text>
-        </TouchableOpacity>
-        
-        <Text style={styles.customHeaderTitle}>{t.title || 'Saved'}</Text>
-        
-        <TouchableOpacity
-          style={styles.homeButton}
-          onPress={() => router.push('/')}
-        >
-          <Text style={styles.homeButtonText}>{t.home || 'Home'}</Text>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeContainer}>
+      {/* Enhanced Header */}
+      <LinearGradient
+        colors={AppColors.gradients.primary}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.customHeader}
+      >
+        <FadeInView delay={0}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t.title || 'Saved Routes'}</Text>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => router.push('/')}
+          >
+            <Ionicons name="home" size={24} color="white" />
+          </TouchableOpacity>
+        </FadeInView>
+      </LinearGradient>
 
       {savedRoutes.length === 0 ? (
-        <View style={styles.emptyContainer}>
+        <FadeInView delay={200} style={styles.emptyContainer}>
+          <Ionicons name="bookmark-outline" size={64} color={AppColors.textLight} />
           <Text style={styles.emptyText}>{t.emptyTitle || 'No saved routes yet'}</Text>
-          <Text style={styles.emptySubtext}>{t.emptySubtitle || 'Tap the ⭐ on any bus to save it'}</Text>
-        </View>
+          <Text style={styles.emptySubtext}>{t.emptySubtitle || 'Tap the heart on any bus to save it'}</Text>
+        </FadeInView>
       ) : (
         <FlatList
           data={savedRoutes}
           renderItem={renderBusItem}
           keyExtractor={(item) => item}
-          contentContainerStyle={{ padding: 15 }}
+          contentContainerStyle={styles.listContent}
+          scrollEnabled={true}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  safeContainer: { flex: 1, backgroundColor: AppColors.background },
   
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: AppColors.background,
   },
 
   customHeader: {
-    backgroundColor: '#1E8449',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
-    paddingBottom: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   
   backButton: { padding: 8 },
-  backButtonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
-  customHeaderTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFF' },
-  
-  homeButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+  headerTitle: { fontSize: 22, fontWeight: 'bold', color: 'white', flex: 1, textAlign: 'center' },
+  homeButton: { padding: 8 },
+
+  listContent: {
+    padding: 16,
+    paddingBottom: 20,
   },
-  homeButtonText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
+
+  busItemContainer: {
+    marginBottom: 12,
+  },
 
   busCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 12,
+    overflow: 'hidden',
+    ...AppColors.shadows.light,
+  },
+
+  busCardGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    gap: 12,
   },
   
-  busHeader: { flexDirection: 'row', alignItems: 'center' },
-  
   busNumber: {
-    backgroundColor: '#C0392B',
-    width: 40,
-    height: 40,
-    borderRadius: 8,
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   
   busNumberText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-  busInfo: { flex: 1 },
-  busName: { fontSize: 16, fontWeight: '600', color: '#2C3E50', marginBottom: 3 },
-  busRoute: { fontSize: 13, color: '#7F8C8D' },
-
-  busMain: {
-    flex: 1,
+  busInfo: { flex: 1, gap: 4 },
+  busName: { fontSize: 15, fontWeight: '600', color: 'white' },
+  routeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
+  busRoute: { color: 'rgba(255,255,255,0.9)', fontSize: 13 },
 
   emptyContainer: { 
     flex: 1, 
-    alignItems: 'center', 
     justifyContent: 'center', 
-    padding: 40 
+    alignItems: 'center',
+    paddingHorizontal: 40,
+    gap: 12,
   },
-  
-  emptyText: { 
-    fontSize: 18, 
-    fontWeight: '600', 
-    color: '#95A5A6', 
-    marginBottom: 10,
-    textAlign: 'center',  // ← ADDED for better text rendering
-  },
-  
-  emptySubtext: { 
-    fontSize: 14, 
-    color: '#BDC3C7', 
-    textAlign: 'center' 
-  },
-
-  removeButton: {
-    marginTop: 10,
-    alignSelf: 'flex-end',
-    backgroundColor: '#FEE2E2',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-
-  removeText: {
-    color: '#B91C1C',
-    fontWeight: '600',
-    fontSize: 14,
-  },
+  emptyText: { fontSize: 18, fontWeight: '600', color: AppColors.textPrimary, marginTop: 8, textAlign: 'center' },
+  emptySubtext: { fontSize: 14, color: AppColors.textSecondary, marginTop: 4, textAlign: 'center' },
 });
