@@ -4,16 +4,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import {
-    AnimatedCard,
-    FadeInView,
-    SlideInView,
+  AnimatedCard,
+  FadeInView,
+  SlideInView,
 } from "../components/AnimatedCard";
 import { AppColors } from "../constants/theme";
 import { strings } from "../src/i18n/strings";
@@ -72,19 +72,19 @@ export default function HomeScreen() {
       {/* Enhanced Quick Actions */}
       <View style={styles.actionsContainer}>
         <SlideInView direction="right" delay={200}>
-          <Link href="/bus-guide" asChild>
+          <Link href="/where-to-go" asChild>
             <AnimatedCard
               style={styles.cardButton}
-              gradientColors={AppColors.gradients.primary}
+              gradientColors={["#059669", "#10B981"]}
               onPress={() => {}}
             >
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="bus" size={24} color="white" />
-                  <Text style={styles.cardTitle}>{t.browseBuses}</Text>
+                  <Ionicons name="location" size={24} color="white" />
+                  <Text style={styles.cardTitle}>{t.whereTo}</Text>
                 </View>
                 <Text style={styles.cardSubtext}>
-                  {t.homeCardSubtextBusGuide}
+                  {t.homeCardSubtextWhereTo}
                 </Text>
               </View>
             </AnimatedCard>
@@ -92,26 +92,6 @@ export default function HomeScreen() {
         </SlideInView>
 
         <SlideInView direction="left" delay={400}>
-          <Link href="/bus-list" asChild>
-            <AnimatedCard
-              style={styles.cardButton}
-              gradientColors={AppColors.gradients.accent}
-              onPress={() => {}}
-            >
-              <View style={styles.cardContent}>
-                <View style={styles.cardHeader}>
-                  <Ionicons name="search" size={24} color="white" />
-                  <Text style={styles.cardTitle}>{t.searchByBusNumber}</Text>
-                </View>
-                <Text style={styles.cardSubtext}>
-                  {t.homeCardSubtextSearchNumber}
-                </Text>
-              </View>
-            </AnimatedCard>
-          </Link>
-        </SlideInView>
-
-        <SlideInView direction="right" delay={600}>
           <Link href="/route-search" asChild>
             <AnimatedCard
               style={styles.cardButton}
@@ -125,6 +105,26 @@ export default function HomeScreen() {
                 </View>
                 <Text style={styles.cardSubtext}>
                   {t.homeCardSubtextSearchRoute}
+                </Text>
+              </View>
+            </AnimatedCard>
+          </Link>
+        </SlideInView>
+
+        <SlideInView direction="right" delay={600}>
+          <Link href="/bus-list" asChild>
+            <AnimatedCard
+              style={styles.cardButton}
+              gradientColors={AppColors.gradients.accent}
+              onPress={() => {}}
+            >
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="search" size={24} color="white" />
+                  <Text style={styles.cardTitle}>{t.searchByBusNumber}</Text>
+                </View>
+                <Text style={styles.cardSubtext}>
+                  {t.homeCardSubtextSearchNumber}
                 </Text>
               </View>
             </AnimatedCard>
@@ -152,19 +152,19 @@ export default function HomeScreen() {
         </SlideInView>
 
         <SlideInView direction="right" delay={1000}>
-          <Link href="/where-to-go" asChild>
+          <Link href="/bus-guide" asChild>
             <AnimatedCard
               style={styles.cardButton}
-              gradientColors={["#059669", "#10B981"]}
+              gradientColors={AppColors.gradients.primary}
               onPress={() => {}}
             >
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="location" size={24} color="white" />
-                  <Text style={styles.cardTitle}>{t.whereTo}</Text>
+                  <Ionicons name="bus" size={24} color="white" />
+                  <Text style={styles.cardTitle}>{t.browseBuses}</Text>
                 </View>
                 <Text style={styles.cardSubtext}>
-                  {t.homeCardSubtextWhereTo}
+                  {t.homeCardSubtextBusGuide}
                 </Text>
               </View>
             </AnimatedCard>

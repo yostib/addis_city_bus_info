@@ -7,18 +7,18 @@
     "icon": "./assets/images/icon.png",
     "scheme": "addisbusguide",
     "userInterfaceStyle": "automatic",
-
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.henot.AddisBusGuide"
+      "bundleIdentifier": "com.henot.AddisBusGuide",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
-
     "android": {
       "package": "com.henot.AddisBusGuide",
       "adaptiveIcon": {
@@ -26,10 +26,15 @@
         "backgroundColor": "#E6F4FE"
       }
     },
-
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4e9759ce-204d-48ad-9665-21c0a8a60110"
+      }
+    }
   }
 }

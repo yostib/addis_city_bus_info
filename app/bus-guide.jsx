@@ -1,42 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FadeInView } from '../components/AnimatedCard';
-import { AppColors } from '../constants/theme';
-import { strings } from '../src/i18n/strings';
-
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { FadeInView } from "../components/AnimatedCard";
+import { AppColors } from "../constants/theme";
+import { strings } from "../src/i18n/strings";
 
 export default function BusGuideScreen() {
   const router = useRouter();
 
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState("en");
   const t = strings[lang].busGuide;
 
-  
+  //const [lang, setLang] = useState('en');
 
-//const [lang, setLang] = useState('en');
-
-useEffect(() => {
-  AsyncStorage.getItem('lang').then(stored => {
-    if (stored) setLang(stored);
-  });
-}, []);
-
-
-
-
-  
-
+  useEffect(() => {
+    AsyncStorage.getItem("lang").then((stored) => {
+      if (stored) setLang(stored);
+    });
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,7 +48,7 @@ useEffect(() => {
           <Text style={styles.headerTitle}>{t.title}</Text>
           <TouchableOpacity
             style={styles.homeButton}
-            onPress={() => router.push('/')}
+            onPress={() => router.push("/")}
           >
             <Ionicons name="home" size={24} color="white" />
           </TouchableOpacity>
@@ -68,37 +59,13 @@ useEffect(() => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Section
-          icon="🚌"
-          title={t.howToRide}
-          text={
-            t.howToRideText
-          }
-        />
+        <Section icon="🚌" title={t.howToRide} text={t.howToRideText} />
 
-        <Section
-          icon="⏰"
-          title={t.peakHours}
-          text={
-            t.peakHoursText
-          }
-        />
+        <Section icon="⏰" title={t.peakHours} text={t.peakHoursText} />
 
-        <Section
-          icon="⭐"
-          title={t.savingRoutes}
-          text={
-            t.savingRoutesText
-          }
-        />
+        <Section icon="⭐" title={t.savingRoutes} text={t.savingRoutesText} />
 
-        <Section
-          icon="🛡️"
-          title={t.safetyTips}
-          text={
-            t.safetyTipsText
-          }
-        />
+        <Section icon="🛡️" title={t.safetyTips} text={t.safetyTipsText} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -124,9 +91,9 @@ const styles = StyleSheet.create({
 
   /* Enhanced Header */
   customHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -135,10 +102,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
   },
   homeButton: {
     padding: 8,
@@ -159,8 +126,8 @@ const styles = StyleSheet.create({
     ...AppColors.shadows.light,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
   sectionIcon: {
@@ -169,7 +136,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: AppColors.textPrimary,
   },
   sectionText: {
